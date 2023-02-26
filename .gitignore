@@ -1,0 +1,4 @@
+/terraform-provider-redash
+/*.tf
+/*.tfstate*
+/dev.tfrc

@@ -1,0 +1,29 @@
+terraform {
+  required_providers {
+    redash = {
+      source = "winebarrel/redash"
+    }
+  }
+}
+
+provider "redash" {
+  url     = "http://localhost:5001"
+  api_key = "G1LARLeRTzoWF7asyy32Qdvken2OZ2LhzoOzwA3r"
+}
+
+resource "redash_data_source" "postgres" {
+  name = "postgres"
+  type = "pg"
+  options = jsonencode({
+    dbname = "postgres"
+    host   = "postgres"
+    port   = 5432
+    user   = "postgres"
+  })
+}
+
+resource "redash_query" "select_1" {
+  data_source_id = resource.redash_data_source.postgres.id
+  name           = "select one"
+  query          = "select 1"
+}
