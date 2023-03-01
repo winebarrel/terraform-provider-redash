@@ -23,6 +23,9 @@ func Provider() *schema.Provider {
 			},
 		},
 		ConfigureContextFunc: providerConfigure,
+		ResourcesMap: map[string]*schema.Resource{
+			"redash_data_source": resourceDataSource(),
+		},
 	}
 }
 
