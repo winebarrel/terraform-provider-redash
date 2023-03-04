@@ -6,13 +6,15 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	redash_go "github.com/winebarrel/redash-go"
+	redashgo "github.com/winebarrel/redash-go"
 )
 
 func resourceDataSource() *schema.Resource {
 	return &schema.Resource{
 		CreateContext: createDataSource,
 		ReadContext:   readDataSource,
+		UpdateContext: updateDataSource,
+		DeleteContext: deleteDataSource,
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -31,9 +33,9 @@ func resourceDataSource() *schema.Resource {
 }
 
 func createDataSource(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
-	client := meta.(*redash_go.Client)
+	client := meta.(*redashgo.Client)
 
-	input := &redash_go.CreateDataSourceInput{
+	input := &redashgo.CreateDataSourceInput{
 		Name: d.Get("name").(string),
 		Type: d.Get("type").(string),
 	}
@@ -54,5 +56,54 @@ func createDataSource(ctx context.Context, d *schema.ResourceData, meta any) dia
 }
 
 func readDataSource(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
+	id, _ := strconv.Atoi(d.Id())
+	client := meta.(*redashgo.Client)
+	ds, err := client.GetDataSource(ctx, id)
+
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	d.Set("name", ds.Name)
+	d.Set("type", ds.Type)
+	d.Set("options", ds.Options)
+
+	return nil
+}
+
+func updateDataSource(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
+	id, _ := strconv.Atoi(d.Id())
+	client := meta.(*redashgo.Client)
+
+	input := &redashgo.UpdateDataSourceInput{
+		Name: d.Get("name").(string),
+		Type: d.Get("type").(string),
+	}
+
+	if v, ok := d.GetOk("options"); ok {
+		input.Options = v.(map[string]any)
+	}
+
+	_, err := client.UpdateDataSource(ctx, id, input)
+
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	return nil
+}
+
+func deleteDataSource(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
+	id, _ := strconv.Atoi(d.Id())
+	client := meta.(*redashgo.Client)
+
+	err := client.DeleteDataSource(ctx, id)
+
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	d.SetId("")
+
 	return nil
 }
