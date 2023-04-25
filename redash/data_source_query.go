@@ -42,6 +42,13 @@ func dataSourceQuery() *schema.Resource {
 					},
 				},
 			},
+			"tags": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
 		},
 	}
 }

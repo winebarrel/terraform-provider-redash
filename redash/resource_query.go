@@ -61,6 +61,13 @@ func resourceQuery() *schema.Resource {
 					},
 				},
 			},
+			"tags": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
 		},
 	}
 }
@@ -77,12 +84,23 @@ func createQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 	}
 
 	if v, ok := d.GetOk("schedule"); ok {
-
 		schedules := v.([]any)
 
 		if len(schedules) == 1 {
 			schedule := schedules[0].(map[string]any)
 			input.Schedule.Interval = schedule["interval"].(int)
+		}
+	}
+
+	if v, ok := d.GetOk("tags"); ok {
+		tags := []string{}
+
+		for _, t := range v.([]any) {
+			tags = append(tags, t.(string))
+		}
+
+		if len(tags) > 0 {
+			input.Tags = tags
 		}
 	}
 
@@ -131,6 +149,16 @@ func readQuery0(ctx context.Context, d *schema.ResourceData, meta any) error {
 		d.Set("schedule", []any{schedule}) //nolint:errcheck
 	}
 
+	if len(query.Tags) > 0 {
+		tags := []any{}
+
+		for _, t := range query.Tags {
+			tags = append(tags, t)
+		}
+
+		d.Set("tags", tags) //nolint:errcheck
+	}
+
 	return nil
 }
 
@@ -153,10 +181,30 @@ func updateQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 		input.Schedule.Interval = schedule["interval"].(int)
 	}
 
+	var tags []string
+
+	if d.HasChange("tags") {
+		tags = []string{}
+
+		if v, ok := d.GetOk("tags"); ok {
+			for _, t := range v.([]any) {
+				tags = append(tags, t.(string))
+			}
+		}
+
+		input.Tags = tags
+	}
+
 	_, err := client.UpdateQuery(ctx, id, input)
 
 	if err != nil {
 		return diag.FromErr(err)
+	}
+
+	if tags != nil && len(tags) == 0 {
+		if _, err := client.RemoveQueryTags(ctx, id); err != nil {
+			return diag.FromErr(err)
+		}
 	}
 
 	return nil

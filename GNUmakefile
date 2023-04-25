@@ -31,7 +31,7 @@ tf-plan: build dev.tfrc
 
 .PHONY: tf-apply
 tf-apply: build dev.tfrc
-	TF_CLI_CONFIG_FILE=dev.tfrc terraform apply
+	TF_CLI_CONFIG_FILE=dev.tfrc terraform apply -auto-approve
 
 .PHONY: redash-setup
 redash-setup:
