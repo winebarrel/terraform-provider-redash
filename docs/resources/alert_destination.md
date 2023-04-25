@@ -3,12 +3,12 @@
 page_title: "redash_alert_destination Resource - redash"
 subcategory: ""
 description: |-
-  Alert Destination resource.
+  
 ---
 
 # redash_alert_destination (Resource)
 
-Alert Destination resource.
+
 
 ## Example Usage
 

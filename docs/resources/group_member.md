@@ -3,12 +3,12 @@
 page_title: "redash_group_member Resource - redash"
 subcategory: ""
 description: |-
-  Group Member resource.
+  
 ---
 
 # redash_group_member (Resource)
 
-Group Member resource.
+
 
 ## Example Usage
 

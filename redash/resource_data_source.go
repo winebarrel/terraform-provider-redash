@@ -12,7 +12,6 @@ import (
 
 func resourceDataSource() *schema.Resource {
 	return &schema.Resource{
-		Description:   "Redash Data Source resource.",
 		CreateContext: createDataSource,
 		ReadContext:   readDataSource,
 		UpdateContext: updateDataSource,

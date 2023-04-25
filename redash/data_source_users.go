@@ -13,7 +13,6 @@ import (
 
 func dataSourceUsers() *schema.Resource {
 	return &schema.Resource{
-		Description: "Data Source to get user IDs.",
 		ReadContext: readUsersByFilter,
 		Schema: map[string]*schema.Schema{
 			"name": {

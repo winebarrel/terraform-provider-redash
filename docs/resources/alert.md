@@ -3,12 +3,12 @@
 page_title: "redash_alert Resource - redash"
 subcategory: ""
 description: |-
-  Alert resource.
+  
 ---
 
 # redash_alert (Resource)
 
-Alert resource.
+
 
 ## Example Usage
 

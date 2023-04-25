@@ -3,12 +3,12 @@
 page_title: "redash_data_source Resource - redash"
 subcategory: ""
 description: |-
-  Redash Data Source resource.
+  
 ---
 
 # redash_data_source (Resource)
 
-Redash Data Source resource.
+
 
 ## Example Usage
 

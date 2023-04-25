@@ -4,6 +4,12 @@
 
 * N/A
 
+## [0.3.2] - 2023-04-26
+
+### Changed
+
+* Remove resource/data source description.
+
 ## [0.3.1] - 2023-04-25
 
 ### Changed

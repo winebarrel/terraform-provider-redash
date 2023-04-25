@@ -12,7 +12,6 @@ import (
 
 func resourceAlertDestination() *schema.Resource {
 	return &schema.Resource{
-		Description:   "Alert Destination resource.",
 		CreateContext: createAlertDestination,
 		ReadContext:   readAlertDestination,
 		DeleteContext: deleteAlertDestination,

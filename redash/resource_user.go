@@ -11,7 +11,6 @@ import (
 
 func resourceUser() *schema.Resource {
 	return &schema.Resource{
-		Description:   "User resource.",
 		CreateContext: createUser,
 		ReadContext:   readUser,
 		UpdateContext: updateUser,

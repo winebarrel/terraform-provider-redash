@@ -11,7 +11,6 @@ import (
 
 func dataSourceQuery() *schema.Resource {
 	return &schema.Resource{
-		Description: "Query data source.",
 		ReadContext: readQueryByName,
 		Schema: map[string]*schema.Schema{
 			"data_source_id": {

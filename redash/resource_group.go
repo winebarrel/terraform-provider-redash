@@ -11,7 +11,6 @@ import (
 
 func resourceGroup() *schema.Resource {
 	return &schema.Resource{
-		Description:   "Group resource.",
 		CreateContext: createGroup,
 		ReadContext:   schema.NoopContext,
 		DeleteContext: deleteGroup,
