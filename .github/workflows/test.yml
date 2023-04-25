@@ -3,15 +3,21 @@ on:
   pull_request:
     paths-ignore:
       - .github/dependabot.yml
+      - docs/**/*
+      - examples/**/*
       - LICENSE
       - README.md
+      - templates/**/*
   push:
     branches:
       - main
     paths-ignore:
       - .github/dependabot.yml
+      - docs/**/*
+      - examples/**/*
       - LICENSE
       - README.md
+      - templates/**/*
 jobs:
   test:
     runs-on: ubuntu-latest
