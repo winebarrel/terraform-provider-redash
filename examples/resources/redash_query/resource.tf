@@ -17,4 +17,5 @@ resource "redash_query" "select_one" {
   schedule {
     interval = 60
   }
+  tags = ["foo", "bar"]
 }
