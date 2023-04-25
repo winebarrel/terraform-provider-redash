@@ -2,9 +2,6 @@
 
 [![terraform docs](https://img.shields.io/badge/terraform-docs-%35835CC?logo=terraform)](https://registry.terraform.io/providers/winebarrel/redash/latest/docs)
 
-
-The [Redash](https://redash.io/) provider.
-
 ## Usage
 
 ```tf
