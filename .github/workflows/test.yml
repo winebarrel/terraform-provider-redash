@@ -18,6 +18,11 @@ on:
       - LICENSE
       - README.md
       - templates/**/*
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
