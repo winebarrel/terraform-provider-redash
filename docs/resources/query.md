@@ -32,6 +32,7 @@ resource "redash_query" "select_one" {
   schedule {
     interval = 60
   }
+  tags = ["foo", "bar"]
 }
 ```
 
@@ -48,6 +49,7 @@ resource "redash_query" "select_one" {
 
 - `description` (String)
 - `schedule` (Block List, Max: 1) (see [below for nested schema](#nestedblock--schedule))
+- `tags` (List of String)
 
 ### Read-Only
 

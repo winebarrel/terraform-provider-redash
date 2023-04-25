@@ -37,6 +37,10 @@ resource "redash_alert" "my_alert" {
 
 - `name` (String)
 
+### Optional
+
+- `tags` (List of String)
+
 ### Read-Only
 
 - `data_source_id` (Number)
