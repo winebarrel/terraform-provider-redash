@@ -36,6 +36,7 @@ func Provider() *schema.Provider {
 			"redash_group_member":       resourceGroupMember(),
 			"redash_group":              resourceGroup(),
 			"redash_query":              resourceQuery(),
+			"redash_user":               resourceUser(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"redash_alert_destination": dataSourceAlertDestination(),

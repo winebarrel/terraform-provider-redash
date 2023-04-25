@@ -76,7 +76,7 @@ func readUsersByFilter(ctx context.Context, d *schema.ResourceData, meta any) di
 		count := rs.Count
 
 		for _, user := range rs.Results {
-			if rName.MatchString(user.Name) && rEmail.MatchString(user.Email) {
+			if rName.MatchString(user.Name) && rEmail.MatchString(user.Email) && !user.IsDisabled {
 				ids = append(ids, user.ID)
 			}
 		}
