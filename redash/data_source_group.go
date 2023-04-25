@@ -11,7 +11,6 @@ import (
 
 func dataSourceGroup() *schema.Resource {
 	return &schema.Resource{
-		Description: "Group data source.",
 		ReadContext: readGroupByName,
 		Schema: map[string]*schema.Schema{
 			"name": {

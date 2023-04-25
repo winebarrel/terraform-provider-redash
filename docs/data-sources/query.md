@@ -3,12 +3,12 @@
 page_title: "redash_query Data Source - redash"
 subcategory: ""
 description: |-
-  Query data source.
+  
 ---
 
 # redash_query (Data Source)
 
-Query data source.
+
 
 ## Example Usage
 

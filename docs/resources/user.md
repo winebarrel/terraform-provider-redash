@@ -3,12 +3,12 @@
 page_title: "redash_user Resource - redash"
 subcategory: ""
 description: |-
-  User resource.
+  
 ---
 
 # redash_user (Resource)
 
-User resource.
+
 
 ## Example Usage
 

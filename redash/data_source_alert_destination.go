@@ -11,7 +11,6 @@ import (
 
 func dataSourceAlertDestination() *schema.Resource {
 	return &schema.Resource{
-		Description: "Alert Destination data source.",
 		ReadContext: readAlertDestinationByName,
 		Schema: map[string]*schema.Schema{
 			"name": {

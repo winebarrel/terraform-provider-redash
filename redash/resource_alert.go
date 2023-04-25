@@ -28,7 +28,6 @@ var (
 
 func resourceAlert() *schema.Resource {
 	return &schema.Resource{
-		Description:   "Alert resource.",
 		CreateContext: createAlert,
 		ReadContext:   readAlert,
 		UpdateContext: updateAlert,

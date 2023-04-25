@@ -3,12 +3,12 @@
 page_title: "redash_group Data Source - redash"
 subcategory: ""
 description: |-
-  Group data source.
+  
 ---
 
 # redash_group (Data Source)
 
-Group data source.
+
 
 ## Example Usage
 

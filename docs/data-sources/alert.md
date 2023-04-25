@@ -3,12 +3,12 @@
 page_title: "redash_alert Data Source - redash"
 subcategory: ""
 description: |-
-  Alert data source
+  
 ---
 
 # redash_alert (Data Source)
 
-Alert data source
+
 
 ## Example Usage
 

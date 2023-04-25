@@ -13,7 +13,6 @@ import (
 
 func resourceGroupDataSource() *schema.Resource {
 	return &schema.Resource{
-		Description:   "Group resource.",
 		CreateContext: createGroupDataSource,
 		ReadContext:   schema.NoopContext,
 		UpdateContext: updateGroupDataSource,

@@ -3,12 +3,12 @@
 page_title: "redash_alert_subscription Resource - redash"
 subcategory: ""
 description: |-
-  Alert Subscription resource.
+  
 ---
 
 # redash_alert_subscription (Resource)
 
-Alert Subscription resource.
+
 
 ## Example Usage
 

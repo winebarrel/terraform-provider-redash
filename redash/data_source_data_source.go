@@ -11,7 +11,6 @@ import (
 
 func dataSourceDataSource() *schema.Resource {
 	return &schema.Resource{
-		Description: "Redash Data Sources data source.",
 		ReadContext: readDataSourceByName,
 		Schema: map[string]*schema.Schema{
 			"name": {

@@ -13,7 +13,6 @@ import (
 
 func resourceGroupMember() *schema.Resource {
 	return &schema.Resource{
-		Description:   "Group Member resource.",
 		CreateContext: createGroupUser,
 		ReadContext:   schema.NoopContext,
 		DeleteContext: deleteGroupUser,

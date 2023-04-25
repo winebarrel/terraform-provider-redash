@@ -3,12 +3,12 @@
 page_title: "redash_user Data Source - redash"
 subcategory: ""
 description: |-
-  User data source.
+  
 ---
 
 # redash_user (Data Source)
 
-User data source.
+
 
 ## Example Usage
 

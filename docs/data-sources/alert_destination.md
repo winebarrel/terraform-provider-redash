@@ -3,12 +3,12 @@
 page_title: "redash_alert_destination Data Source - redash"
 subcategory: ""
 description: |-
-  Alert Destination data source.
+  
 ---
 
 # redash_alert_destination (Data Source)
 
-Alert Destination data source.
+
 
 ## Example Usage
 

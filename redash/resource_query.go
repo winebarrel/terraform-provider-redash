@@ -12,7 +12,6 @@ import (
 
 func resourceQuery() *schema.Resource {
 	return &schema.Resource{
-		Description:   "Query resource.",
 		CreateContext: createQuery,
 		ReadContext:   readQuery,
 		UpdateContext: updateQuery,

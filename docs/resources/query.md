@@ -3,12 +3,12 @@
 page_title: "redash_query Resource - redash"
 subcategory: ""
 description: |-
-  Query resource.
+  
 ---
 
 # redash_query (Resource)
 
-Query resource.
+
 
 ## Example Usage
 

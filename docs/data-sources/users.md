@@ -3,12 +3,12 @@
 page_title: "redash_users Data Source - redash"
 subcategory: ""
 description: |-
-  Data Source to get user IDs.
+  
 ---
 
 # redash_users (Data Source)
 
-Data Source to get user IDs.
+
 
 ## Example Usage
 

@@ -13,7 +13,6 @@ import (
 
 func resourceAlertSubscription() *schema.Resource {
 	return &schema.Resource{
-		Description:   "Alert Subscription resource.",
 		CreateContext: createAlertSubscription,
 		ReadContext:   schema.NoopContext,
 		DeleteContext: deleteAlertSubscription,
