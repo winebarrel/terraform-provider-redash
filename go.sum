@@ -174,8 +174,8 @@ github.com/vmihailenco/msgpack/v5 v5.3.5 h1:5gO0H1iULLWGhs2H5tbAHIZTV8/cYafcFOr9
 github.com/vmihailenco/msgpack/v5 v5.3.5/go.mod h1:7xyJ9e+0+9SaZT0Wt1RGleJXzli6Q/V5KbhBonMG9jc=
 github.com/vmihailenco/tagparser/v2 v2.0.0 h1:y09buUbR+b5aycVFQs/g70pqKVZNBmxwAhO7/IwNM9g=
 github.com/vmihailenco/tagparser/v2 v2.0.0/go.mod h1:Wri+At7QHww0WTrCBeu4J6bNtoV6mEfg5OIWRZA9qds=
-github.com/winebarrel/redash-go v1.1.2 h1:7o2v9ePuFMrjmKorVGga1PcjbE2KXa31ZIt4fPBr9ms=
-github.com/winebarrel/redash-go v1.1.2/go.mod h1:qKv8lAoYpqCwwfrOaK0cCauc8O9xmlWe6U8SZKpSUJY=
+github.com/winebarrel/redash-go v1.2.0 h1:CpGOld3U9vjv6cyYb3j+J+m0nVDF2F6wyrRKRyKx6es=
+github.com/winebarrel/redash-go v1.2.0/go.mod h1:qKv8lAoYpqCwwfrOaK0cCauc8O9xmlWe6U8SZKpSUJY=
 github.com/xanzy/ssh-agent v0.3.3 h1:+/15pJfg/RsTxqYcX6fHqOXZwwMP+2VyYWJeWM2qQFM=
 github.com/zclconf/go-cty v1.13.1 h1:0a6bRwuiSHtAmqCqNOE+c2oHgepv0ctoxU4FUe43kwc=
 github.com/zclconf/go-cty v1.13.1/go.mod h1:YKQzy/7pZ7iq2jNFzy5go57xdxdWoLLpaEp4u238AE0=
