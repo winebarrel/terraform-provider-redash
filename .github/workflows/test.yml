@@ -9,8 +9,6 @@ on:
       - README.md
       - templates/**/*
   push:
-    branches:
-      - main
     paths-ignore:
       - .github/dependabot.yml
       - docs/**/*
