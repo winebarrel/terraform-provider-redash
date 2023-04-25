@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/logging"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	redash_go "github.com/winebarrel/redash-go"
 )
@@ -66,6 +67,8 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (any, diag.D
 	if err != nil {
 		return nil, diag.FromErr(err)
 	}
+
+	client.Debug = logging.IsDebugOrHigher()
 
 	return client, nil
 }
