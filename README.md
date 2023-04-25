@@ -29,7 +29,7 @@ resource "redash_data_source" "postgres" {
   })
 }
 
-resource "redash_query" "select_1" {
+resource "redash_query" "select_one" {
   data_source_id = resource.redash_data_source.postgres.id
   name           = "select one"
   query          = "select 1"
