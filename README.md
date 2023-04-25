@@ -1,6 +1,6 @@
 # terraform-provider-redash
 
-The Redash provider.
+The [Redash](https://redash.io/) provider.
 
 ## Usage
 
