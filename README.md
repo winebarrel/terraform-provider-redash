@@ -2,7 +2,6 @@
 
 [![test](https://github.com/winebarrel/terraform-provider-redash/actions/workflows/test.yml/badge.svg)](https://github.com/winebarrel/terraform-provider-redash/actions/workflows/test.yml)
 [![terraform docs](https://img.shields.io/badge/terraform-docs-%35835CC?logo=terraform)](https://registry.terraform.io/providers/winebarrel/redash/latest/docs)
-[![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/winebarrel/terraform-provider-redash)](https://github.com/winebarrel/terraform-provider-redash/tags)
 
 Terraform provider for [Redash](https://redash.io/).
 
