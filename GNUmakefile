@@ -46,6 +46,6 @@ redash-create-db:
 	docker compose run --rm server create_db
 
 # cf. https://developer.hashicorp.com/terraform/tutorials/providers-plugin-framework/providers-plugin-framework-documentation-generation
-.PHONY: doc
-doc:
+.PHONY: docs
+docs:
 	go generate ./...
