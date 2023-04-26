@@ -17,8 +17,8 @@ terraform {
 }
 
 provider "redash" {
-  url     = "http://localhost:5001"
-  api_key = "..."
+  url     = "http://localhost:5001" # or `$REDASH_URL`
+  api_key = "..."                   # or `$REDASH_API_KEY`
 }
 
 resource "redash_data_source" "postgres" {
