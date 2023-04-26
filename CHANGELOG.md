@@ -4,6 +4,12 @@
 
 * N/A
 
+## [0.4.0] - 2023-04-26
+
+### Added
+
+* Support `redash_alert_subscription` import.
+
 ## [0.3.2] - 2023-04-26
 
 ### Changed

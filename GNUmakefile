@@ -33,6 +33,10 @@ tf-plan: build dev.tfrc
 tf-apply: build dev.tfrc
 	TF_CLI_CONFIG_FILE=dev.tfrc terraform apply -auto-approve
 
+.PHONY: tf-clean
+tf-clean: clean
+	rm -f dev.tfrc terraform.tfstate*
+
 .PHONY: redash-setup
 redash-setup:
 	psql -U postgres -h localhost -p 15432 -f etc/redash.sql
