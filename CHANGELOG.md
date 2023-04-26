@@ -10,6 +10,10 @@
 
 * Support `redash_alert_subscription` import.
 
+### Changed
+
+* Check import ID.
+
 ## [0.3.2] - 2023-04-26
 
 ### Changed

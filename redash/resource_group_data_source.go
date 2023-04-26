@@ -103,8 +103,17 @@ func deleteGroupDataSource(ctx context.Context, d *schema.ResourceData, meta any
 
 func importGroupDataSource(ctx context.Context, d *schema.ResourceData, meta any) ([]*schema.ResourceData, error) {
 	groupGdsId := strings.SplitN(d.Id(), "/", 2)
-	groupId, _ := strconv.Atoi(groupGdsId[0])
-	gdsId, _ := strconv.Atoi(groupGdsId[1])
+	groupId, err := strconv.Atoi(groupGdsId[0])
+
+	if err != nil {
+		return nil, err
+	}
+
+	gdsId, err := strconv.Atoi(groupGdsId[1])
+
+	if err != nil {
+		return nil, err
+	}
 
 	d.Set("group_id", groupId)     //nolint:errcheck
 	d.Set("data_source_id", gdsId) //nolint:errcheck
