@@ -5,6 +5,7 @@ on:
       - .github/dependabot.yml
       - docs/**/*
       - examples/**/*
+      - .github/FUNDING.yml
       - LICENSE
       - README.md
       - templates/**/*
@@ -13,6 +14,7 @@ on:
       - .github/dependabot.yml
       - docs/**/*
       - examples/**/*
+      - .github/FUNDING.yml
       - LICENSE
       - README.md
       - templates/**/*
