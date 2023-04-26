@@ -69,8 +69,18 @@ func deleteAlertSubscription(ctx context.Context, d *schema.ResourceData, meta a
 
 func importAlertSubscription(ctx context.Context, d *schema.ResourceData, meta any) ([]*schema.ResourceData, error) {
 	alertDestId := strings.SplitN(d.Id(), "/", 2)
-	alertId, _ := strconv.Atoi(alertDestId[0])
-	destId, _ := strconv.Atoi(alertDestId[1])
+	alertId, err := strconv.Atoi(alertDestId[0])
+
+	if err != nil {
+		return nil, err
+	}
+
+	destId, err := strconv.Atoi(alertDestId[1])
+
+	if err != nil {
+		return nil, err
+	}
+
 	client := meta.(*redashgo.Client)
 
 	subsList, err := client.ListAlertSubscriptions(ctx, alertId)

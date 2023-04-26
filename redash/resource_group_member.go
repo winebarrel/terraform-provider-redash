@@ -68,8 +68,17 @@ func deleteGroupUser(ctx context.Context, d *schema.ResourceData, meta any) diag
 
 func importGroupMember(ctx context.Context, d *schema.ResourceData, meta any) ([]*schema.ResourceData, error) {
 	groupMemberId := strings.SplitN(d.Id(), "/", 2)
-	groupId, _ := strconv.Atoi(groupMemberId[0])
-	memberId, _ := strconv.Atoi(groupMemberId[1])
+	groupId, err := strconv.Atoi(groupMemberId[0])
+
+	if err != nil {
+		return nil, err
+	}
+
+	memberId, err := strconv.Atoi(groupMemberId[1])
+
+	if err != nil {
+		return nil, err
+	}
 
 	d.Set("group_id", groupId) //nolint:errcheck
 	d.Set("user_id", memberId) //nolint:errcheck

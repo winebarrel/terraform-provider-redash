@@ -15,7 +15,7 @@ func resourceGroup() *schema.Resource {
 		ReadContext:   schema.NoopContext,
 		DeleteContext: deleteGroup,
 		Importer: &schema.ResourceImporter{
-			StateContext: schema.ImportStatePassthroughContext,
+			StateContext: importGroup,
 		},
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -58,4 +58,14 @@ func deleteGroup(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 	d.SetId("")
 
 	return nil
+}
+
+func importGroup(ctx context.Context, d *schema.ResourceData, meta any) ([]*schema.ResourceData, error) {
+	_, err := strconv.Atoi(d.Id())
+
+	if err != nil {
+		return nil, err
+	}
+
+	return []*schema.ResourceData{d}, nil
 }
