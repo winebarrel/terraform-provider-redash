@@ -180,10 +180,8 @@ func updateQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 		input.Schedule.Interval = schedule["interval"].(int)
 	}
 
-	var tags []string
-
 	if d.HasChange("tags") {
-		tags = []string{}
+		tags := []string{}
 
 		if v, ok := d.GetOk("tags"); ok {
 			for _, t := range v.([]any) {
@@ -191,19 +189,13 @@ func updateQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 			}
 		}
 
-		input.Tags = tags
+		input.Tags = &tags
 	}
 
 	_, err := client.UpdateQuery(ctx, id, input)
 
 	if err != nil {
 		return diag.FromErr(err)
-	}
-
-	if tags != nil && len(tags) == 0 {
-		if _, err := client.RemoveQueryTags(ctx, id); err != nil {
-			return diag.FromErr(err)
-		}
 	}
 
 	return nil

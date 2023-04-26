@@ -4,6 +4,13 @@
 
 * N/A
 
+## [0.4.1] - 2023-04-26
+
+### Changed
+
+* Update redash-go.
+* Update query tags update processing.
+
 ## [0.4.0] - 2023-04-26
 
 ### Added
