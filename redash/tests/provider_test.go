@@ -1,4 +1,4 @@
-package redash_test
+package test
 
 import (
 	"context"
