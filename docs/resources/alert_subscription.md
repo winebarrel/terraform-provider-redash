@@ -51,4 +51,10 @@ resource "redash_alert_subscription" "my_subs" {
 
 - `id` (String) The ID of this resource.
 
+## Import
 
+Import is supported using the following syntax:
+
+```shell
+terraform import redash_alert_subscription.my_subs 111/222 # Alert ID/Alert Destination ID
+```
