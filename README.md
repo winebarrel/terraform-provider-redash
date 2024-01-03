@@ -1,6 +1,6 @@
 # terraform-provider-redash
 
-[![test](https://github.com/winebarrel/terraform-provider-redash/actions/workflows/test.yml/badge.svg)](https://github.com/winebarrel/terraform-provider-redash/actions/workflows/test.yml)
+[![CI](https://github.com/winebarrel/terraform-provider-redash/actions/workflows/ci.yml/badge.svg)](https://github.com/winebarrel/terraform-provider-redash/actions/workflows/ci.yml)
 [![terraform docs](https://img.shields.io/badge/terraform-docs-%35835CC?logo=terraform)](https://registry.terraform.io/providers/winebarrel/redash/latest/docs)
 
 Terraform provider for [Redash](https://redash.io/).
