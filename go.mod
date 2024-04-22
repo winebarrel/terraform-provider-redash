@@ -3,7 +3,7 @@ module github.com/winebarrel/terraform-provider-redash
 go 1.21
 
 require (
-	github.com/hashicorp/terraform-plugin-docs v0.19.0
+	github.com/hashicorp/terraform-plugin-docs v0.19.1
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.33.0
 	github.com/stretchr/testify v1.9.0
 	github.com/winebarrel/redash-go v1.4.1
