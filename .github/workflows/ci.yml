@@ -18,7 +18,7 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
-      - uses: golangci/golangci-lint-action@v4
+      - uses: golangci/golangci-lint-action@v5
       - name: Start services
         run: |
           for i in {1..60}; do docker compose up -d && break; sleep 1; done
