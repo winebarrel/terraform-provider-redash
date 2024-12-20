@@ -1,7 +1,8 @@
 module github.com/winebarrel/terraform-provider-redash
 
-go 1.22.0
-toolchain go1.23.2
+go 1.22.7
+
+toolchain go1.23.4
 
 require (
 	github.com/hashicorp/terraform-plugin-docs v0.20.1
@@ -75,7 +76,7 @@ require (
 	golang.org/x/crypto v0.31.0 // indirect
 	golang.org/x/exp v0.0.0-20230626212559-97b1e661b5df // indirect
 	golang.org/x/mod v0.21.0 // indirect
-	golang.org/x/net v0.28.0 // indirect
+	golang.org/x/net v0.33.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
