@@ -17,7 +17,7 @@ var (
 
 const (
 	testAccRedashURL    = "http://localhost:5001"
-	testAccRedashAPIKey = "G1LARLeRTzoWF7asyy32Qdvken2OZ2LhzoOzwA3r"
+	testAccRedashAPIKey = "6nh64ZsT66WeVJvNZ6WB5D2JKZULeC2VBdSD68wt"
 )
 
 func init() {

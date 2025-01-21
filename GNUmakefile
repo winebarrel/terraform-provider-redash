@@ -41,6 +41,10 @@ tf-clean: clean
 redash-setup:
 	psql -U postgres -h localhost -p 15432 -f etc/redash.sql
 
+.PHONY: redash-upgrade-db
+redash-upgrade-db:
+	docker compose run --rm server manage db upgrade
+
 .PHONY: redash-create-db
 redash-create-db:
 	docker compose run --rm server create_db

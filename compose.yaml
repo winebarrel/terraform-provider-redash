@@ -5,13 +5,17 @@ x-redash-environment: &redash-environment
   REDASH_RATELIMIT_ENABLED: "false"
   REDASH_MAIL_DEFAULT_SENDER: "redash@example.com"
   REDASH_MAIL_SERVER: "email"
+  REDASH_MAIL_PORT: 1025
   REDASH_ENFORCE_CSRF: "true"
   REDASH_GUNICORN_TIMEOUT: 60
   REDASH_COOKIE_SECRET: secret
+  REDASH_HOST: "http://localhost:5001/"
+  # REDASH_FEATURE_SHOW_PERMISSIONS_CONTROL: true
 
 services:
   server:
-    image: redash/redash:10.1.0.b50633
+    image: redash/redash:25.1.0
+    # command: dev_server
     depends_on:
       postgres:
         condition: service_healthy
@@ -24,25 +28,27 @@ services:
       <<: *redash-environment
       PYTHONUNBUFFERED: 0
   scheduler:
-    image: redash/redash:10.1.0.b50633
+    image: redash/redash:25.1.0
     command: scheduler
+    # command: dev_scheduler
     depends_on:
       - server
     environment:
       <<: *redash-environment
   worker:
-    image: redash/redash:10.1.0.b50633
+    image: redash/redash:25.1.0
     command: worker
+    # command: dev_worker
     depends_on:
       - server
     environment:
       <<: *redash-environment
       PYTHONUNBUFFERED: 0
   redis:
-    image: redis:3-alpine
+    image: redis:7-alpine
     restart: unless-stopped
   postgres:
-    image: postgres:9.6-alpine
+    image: pgautoupgrade/pgautoupgrade:16-alpine3.8
     ports:
       - "15432:5432"
     command: "postgres -c fsync=off -c full_page_writes=off -c synchronous_commit=OFF"
@@ -55,7 +61,9 @@ services:
       timeout: 1s
       retries: 10
   email:
-    image: djfarrelly/maildev
+    image: maildev/maildev
     ports:
-      - "1080:80"
+      - "10081:1080"
+    environment:
+      MAILDEV_WEB_PORT: 1080
     restart: unless-stopped
