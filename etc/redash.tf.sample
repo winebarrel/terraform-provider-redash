@@ -8,7 +8,7 @@ terraform {
 
 provider "redash" {
   url     = "http://localhost:5001"
-  api_key = "G1LARLeRTzoWF7asyy32Qdvken2OZ2LhzoOzwA3r"
+  api_key = "6nh64ZsT66WeVJvNZ6WB5D2JKZULeC2VBdSD68wt"
 }
 
 resource "redash_data_source" "postgres" {
