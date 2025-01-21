@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/logging"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	redash_go "github.com/winebarrel/redash-go"
+	redash_go "github.com/winebarrel/redash-go/v2"
 )
 
 func Provider() *schema.Provider {

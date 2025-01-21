@@ -7,7 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	redashgo "github.com/winebarrel/redash-go"
+	redashgo "github.com/winebarrel/redash-go/v2"
 )
 
 func dataSourceUser() *schema.Resource {

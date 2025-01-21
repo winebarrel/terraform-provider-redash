@@ -44,6 +44,7 @@ resource "redash_query" "select_one" {
 ```sh
 docker compose up -d
 make redash-setup
+make redash-upgrade-db
 make testacc
 ```
 
@@ -52,10 +53,17 @@ make testacc
 ```sh
 docker compose up -d
 make redash-setup
+make redash-upgrade-db
 cp etc/redash.tf.sample redash.tf
 make tf-plan
 make tf-apply
 ```
+
+**NOTE:**
+* local Redash URL: http://localhost:5001
+* email: `admin@example.com`
+* password: `password`
+* mail server URL: http://localhost:10081
 
 ## Related Links
 
