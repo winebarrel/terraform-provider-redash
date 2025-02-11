@@ -1,8 +1,10 @@
 # Changelog
 
-## [Unreleased]
+## [1.0.0] - 2025-01-21
 
-* N/A
+### Changed
+
+* Update redash-go to v2.
 
 ## [0.4.1] - 2023-04-26
 
