@@ -34,5 +34,3 @@ output "example_com_user_ids" {
 
 - `id` (String) The ID of this resource.
 - `ids` (List of Number)
-
-

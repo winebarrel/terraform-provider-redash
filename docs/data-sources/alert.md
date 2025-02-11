@@ -57,5 +57,3 @@ Read-Only:
 - `op` (String)
 - `template` (String)
 - `value` (Number)
-
-

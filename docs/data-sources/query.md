@@ -55,5 +55,3 @@ resource "redash_alert" "my_alert" {
 Read-Only:
 
 - `interval` (Number)
-
-
