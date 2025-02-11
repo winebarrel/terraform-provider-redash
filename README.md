@@ -24,6 +24,7 @@ provider "redash" {
 resource "redash_data_source" "postgres" {
   name = "postgres"
   type = "pg"
+  # see https://github.com/getredash/redash/blob/v25.1/redash/query_runner/pg.py#L149-L153
   options = jsonencode({
     dbname = "postgres"
     host   = "postgres"
