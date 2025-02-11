@@ -45,5 +45,3 @@ resource "redash_group_data_source" "my_group_ds" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-
-

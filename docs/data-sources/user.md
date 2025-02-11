@@ -38,5 +38,3 @@ resource "redash_group_member" "my_member" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-
-

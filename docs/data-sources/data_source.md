@@ -40,5 +40,3 @@ resource "redash_query" "select_one" {
 - `id` (String) The ID of this resource.
 - `options` (String)
 - `type` (String)
-
-

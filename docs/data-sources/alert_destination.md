@@ -47,5 +47,3 @@ resource "redash_alert_subscription" "my_subs" {
 - `id` (String) The ID of this resource.
 - `options` (String)
 - `type` (String)
-
-
