@@ -1677,13 +1677,6 @@ CREATE UNIQUE INDEX users_org_id_email ON public.users USING btree (org_id, emai
 
 
 --
--- Name: queries queries_search_vector_trigger; Type: TRIGGER; Schema: public; Owner: postgres
---
-
-CREATE TRIGGER queries_search_vector_trigger BEFORE INSERT OR UPDATE ON public.queries FOR EACH ROW EXECUTE FUNCTION public.queries_search_vector_update();
-
-
---
 -- Name: access_permissions access_permissions_grantee_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
