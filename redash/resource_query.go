@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	redashgo "github.com/winebarrel/redash-go/v2"
 )
 
@@ -60,6 +62,103 @@ func resourceQuery() *schema.Resource {
 					},
 				},
 			},
+			"options": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"parameter": {
+							Description: "TODO",
+							Type:        schema.TypeList,
+							MaxItems:    1,
+							Optional:    true,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									"name": {
+										Description: "TODO",
+										Type:        schema.TypeString,
+										Required:    true,
+									},
+									"type": {
+										Description: "TODO",
+										Type:        schema.TypeString,
+										Required:    true,
+										ValidateFunc: validation.StringInSlice([]string{
+											"text",
+											"text-pattern",
+											"number",
+											"enum",
+											"query",
+											"date",
+											"datetime-local",
+											"datetime-with-seconds",
+											"date-range",
+											"datetime-range",
+											"datetime-range-with-seconds",
+										}, false),
+									},
+									"value": {
+										Description: "TODO",
+										Type:        schema.TypeString,
+										Optional:    true,
+									},
+									"regex": {
+										Description: "TODO",
+										Type:        schema.TypeString,
+										Optional:    true,
+									},
+									"enum": {
+										Description: "TODO",
+										Type:        schema.TypeList,
+										MaxItems:    1,
+										Optional:    true,
+										Elem: &schema.Resource{
+											Schema: map[string]*schema.Schema{
+												"options": {
+													Description: "TODO",
+													Type:        schema.TypeList,
+													MinItems:    1,
+													Required:    true,
+													Elem: &schema.Schema{
+														Type: schema.TypeString,
+													},
+												},
+												"multi_values": {
+													Description: "TODO",
+													Type:        schema.TypeList,
+													MaxItems:    1,
+													Optional:    true,
+													Elem: &schema.Resource{
+														Schema: map[string]*schema.Schema{
+															"quotation": {
+																Description:  "TODO",
+																Type:         schema.TypeString,
+																Optional:     true,
+																ValidateFunc: validation.StringInSlice([]string{`"`, `'`}, false),
+															},
+															"separator": {
+																Description: "TODO",
+																Type:        schema.TypeString,
+																Optional:    true,
+																Default:     ",",
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+									"query_id": {
+										Description: "TODO",
+										Type:        schema.TypeInt,
+										Optional:    true,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 			"tags": {
 				Type:     schema.TypeList,
 				Optional: true,
@@ -71,8 +170,86 @@ func resourceQuery() *schema.Resource {
 	}
 }
 
+func getQueryOptions(d *schema.ResourceData) []redashgo.QueryOptionsParameter {
+	v, ok := d.GetOk("options")
+
+	if !ok {
+		return nil
+	}
+
+	options := v.([]any)
+
+	if len(options) == 0 {
+		return nil
+	}
+
+	parameters := options[0].([]any)
+
+	if len(parameters) == 0 {
+		return nil
+	}
+
+	queryParams := []redashgo.QueryOptionsParameter{}
+
+	for _, p := range parameters {
+		param := p.(map[string]any)
+
+		qp := redashgo.QueryOptionsParameter{
+			Name: param["name"].(string),
+			Type: param["type"].(string),
+		}
+
+		if value, ok := param["value"]; ok {
+			qp.Value = value.(string)
+		}
+
+		if regex, ok := param["regex"]; ok {
+			qp.Regex = regex.(string)
+		}
+
+		if enumBlk, ok := param["enum"]; ok {
+			enumList := enumBlk.([]any)
+
+			if len(enumList) == 1 {
+				enum := enumList[0].(map[string]any)
+				qp.EnumOptions = strings.Join(enum["options"].([]string), "\n")
+
+				if multiValuesBlk, ok := enum["multi_values"]; ok {
+					multiValuesList := multiValuesBlk.([]any)
+
+					if len(multiValuesList) >= 1 {
+						multiValues := multiValuesList[0].(map[string]any)
+						qbmvo := &redashgo.QueryOptionsParameterMultiValuesOptions{}
+
+						if quotation, ok := multiValues["quotation"]; ok {
+							qs := quotation.(string)
+							qbmvo.Prefix = qs
+							qbmvo.Suffix = qs
+						}
+
+						if separator, ok := multiValues["separator"]; ok {
+							qbmvo.Separator = separator.(string)
+						}
+
+						qp.MultiValuesOptions = qbmvo
+					}
+				}
+			}
+		}
+
+		if queryID, ok := param["query_id"]; ok {
+			qp.QueryID = queryID.(int)
+		}
+
+		queryParams = append(queryParams, qp)
+	}
+
+	return queryParams
+}
+
 func createQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
 	client := meta.(*redashgo.Client)
+	queryParams := getQueryOptions(d)
 
 	input := &redashgo.CreateQueryInput{
 		DataSourceID: d.Get("data_source_id").(int),
@@ -80,6 +257,9 @@ func createQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 		Description:  d.Get("description").(string),
 		Query:        d.Get("query").(string),
 		Schedule:     &redashgo.CreateQueryInputSchedule{},
+		Options: &redashgo.CreateQueryInputOptions{
+			Parameters: queryParams,
+		},
 	}
 
 	if v, ok := d.GetOk("schedule"); ok {
@@ -164,6 +344,7 @@ func readQuery0(ctx context.Context, d *schema.ResourceData, meta any) error {
 func updateQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
 	id, _ := strconv.Atoi(d.Id())
 	client := meta.(*redashgo.Client)
+	queryParams := getQueryOptions(d)
 
 	input := &redashgo.UpdateQueryInput{
 		DataSourceID: d.Get("data_source_id").(int),
@@ -171,6 +352,9 @@ func updateQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 		Description:  d.Get("description").(string),
 		Query:        d.Get("query").(string),
 		Schedule:     &redashgo.UpdateQueryInputSchedule{},
+		Options: &redashgo.UpdateQueryInputOptions{
+			Parameters: queryParams,
+		},
 	}
 
 	schedules := d.Get("schedule").([]any)
