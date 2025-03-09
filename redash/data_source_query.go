@@ -17,15 +17,15 @@ func dataSourceQuery() *schema.Resource {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"id": {
+			"query_id": {
 				Type:         schema.TypeInt,
 				Optional:     true,
-				AtLeastOneOf: []string{"id", "name"},
+				AtLeastOneOf: []string{"query_id", "name"},
 			},
 			"name": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				AtLeastOneOf: []string{"id", "name"},
+				AtLeastOneOf: []string{"query_id", "name"},
 			},
 			"description": {
 				Type:     schema.TypeString,
@@ -135,17 +135,17 @@ func dataSourceQuery() *schema.Resource {
 
 func readQueryByName(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
 	client := meta.(*redashgo.Client)
-	var id *int
+	var queryId *int
 
-	if rawId, ok := d.GetOk("id"); ok {
+	if rawId, ok := d.GetOk("query_id"); ok {
 		n := rawId.(int)
-		id = &n
+		queryId = &n
 	}
 
 	name := d.Get("name").(string)
 
-	if id != nil {
-		query, err := client.GetQuery(ctx, *id)
+	if queryId != nil {
+		query, err := client.GetQuery(ctx, *queryId)
 
 		if err != nil {
 			return diag.Errorf("Query not found: %s", err)
