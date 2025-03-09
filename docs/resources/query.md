@@ -48,6 +48,7 @@ resource "redash_query" "select_one" {
 ### Optional
 
 - `description` (String)
+- `options` (Block List) (see [below for nested schema](#nestedblock--options))
 - `published` (Boolean)
 - `schedule` (Block List, Max: 1) (see [below for nested schema](#nestedblock--schedule))
 - `tags` (List of String)
@@ -55,6 +56,53 @@ resource "redash_query" "select_one" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+- `query_id` (Number)
+
+<a id="nestedblock--options"></a>
+### Nested Schema for `options`
+
+Required:
+
+- `parameter` (Block Set, Min: 1) (see [below for nested schema](#nestedblock--options--parameter))
+
+<a id="nestedblock--options--parameter"></a>
+### Nested Schema for `options.parameter`
+
+Required:
+
+- `name` (String)
+- `type` (String)
+
+Optional:
+
+- `enum` (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--parameter--enum))
+- `query_id` (Number)
+- `regex` (String)
+- `title` (String)
+- `value` (String)
+
+<a id="nestedblock--options--parameter--enum"></a>
+### Nested Schema for `options.parameter.enum`
+
+Required:
+
+- `options` (List of String)
+
+Optional:
+
+- `multi_values` (Block List, Max: 1) (see [below for nested schema](#nestedblock--options--parameter--enum--multi_values))
+
+<a id="nestedblock--options--parameter--enum--multi_values"></a>
+### Nested Schema for `options.parameter.enum.multi_values`
+
+Optional:
+
+- `quotation` (String)
+- `separator` (String)
+
+
+
+
 
 <a id="nestedblock--schedule"></a>
 ### Nested Schema for `schedule`
