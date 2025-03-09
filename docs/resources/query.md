@@ -48,6 +48,7 @@ resource "redash_query" "select_one" {
 ### Optional
 
 - `description` (String)
+- `published` (Boolean)
 - `schedule` (Block List, Max: 1) (see [below for nested schema](#nestedblock--schedule))
 - `tags` (List of String)
 

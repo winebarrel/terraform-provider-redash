@@ -37,6 +37,11 @@ func resourceQuery() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
+			"published": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
 			"schedule": {
 				Type:     schema.TypeList,
 				Optional: true,
@@ -109,6 +114,18 @@ func createQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 		return diag.FromErr(err)
 	}
 
+	if v, ok := d.GetOk("published"); ok {
+		published := v.(bool)
+
+		if published {
+			err = client.PublishQuery(ctx, query.ID)
+
+			if err != nil {
+				return diag.FromErr(err)
+			}
+		}
+	}
+
 	d.SetId(strconv.Itoa(query.ID))
 
 	return readQuery(ctx, d, meta)
@@ -142,6 +159,7 @@ func readQuery0(ctx context.Context, d *schema.ResourceData, meta any) error {
 	d.Set("name", query.Name)                   //nolint:errcheck
 	d.Set("description", query.Description)     //nolint:errcheck
 	d.Set("query", query.Query)                 //nolint:errcheck
+	d.Set("published", !query.IsDraft)          //nolint:errcheck
 
 	if query.Schedule != nil && query.Schedule.Interval != 0 {
 		schedule := map[string]any{"interval": query.Schedule.Interval}
@@ -164,6 +182,7 @@ func readQuery0(ctx context.Context, d *schema.ResourceData, meta any) error {
 func updateQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
 	id, _ := strconv.Atoi(d.Id())
 	client := meta.(*redashgo.Client)
+	isDraft := !d.Get("published").(bool)
 
 	input := &redashgo.UpdateQueryInput{
 		DataSourceID: d.Get("data_source_id").(int),
@@ -171,6 +190,7 @@ func updateQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 		Description:  d.Get("description").(string),
 		Query:        d.Get("query").(string),
 		Schedule:     &redashgo.UpdateQueryInputSchedule{},
+		IsDraft:      &isDraft,
 	}
 
 	schedules := d.Get("schedule").([]any)

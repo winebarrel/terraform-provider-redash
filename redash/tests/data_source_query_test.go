@@ -24,6 +24,7 @@ func TestAccDataSoureceQuery_basic(t *testing.T) {
 						"interval": "600",
 					}),
 					resource.TestCheckNoResourceAttr("data.redash_query.my_query", "tags"),
+					resource.TestCheckResourceAttr("data.redash_query.my_query", "published", "false"),
 				),
 			},
 			{
@@ -40,6 +41,21 @@ func TestAccDataSoureceQuery_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.redash_query.my_query", "tags.0", "bar"),
 					resource.TestCheckResourceAttr("data.redash_query.my_query", "tags.1", "zoo"),
 					resource.TestCheckResourceAttr("data.redash_query.my_query", "tags.2", "baz"),
+					resource.TestCheckResourceAttr("data.redash_query.my_query", "published", "false"),
+				),
+			},
+			{
+				Config: testAccQueryConfigWithPublish,
+			},
+			{
+				Config: testAccDataSoureceQueryConfigWithPublish,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("data.redash_query.my_query", "name", "my-query"),
+					resource.TestCheckResourceAttr("data.redash_query.my_query", "description", "my-query desc"),
+					resource.TestCheckResourceAttr("data.redash_query.my_query", "query", "select 1"),
+					resource.TestCheckNoResourceAttr("data.redash_query.my_query", "schedule"),
+					resource.TestCheckResourceAttr("data.redash_query.my_query", "tags.#", "1"),
+					resource.TestCheckResourceAttr("data.redash_query.my_query", "published", "true"),
 				),
 			},
 		},
@@ -55,5 +71,11 @@ data "redash_query" "my_query" {
 const testAccDataSoureceQueryConfigWithTags = testAccQueryConfigWithTags + `
 data "redash_query" "my_query" {
   name = "my-query2"
+}
+`
+
+const testAccDataSoureceQueryConfigWithPublish = testAccQueryConfigWithPublish + `
+data "redash_query" "my_query" {
+  name = "my-query"
 }
 `

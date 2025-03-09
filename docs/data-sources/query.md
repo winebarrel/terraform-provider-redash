@@ -46,6 +46,7 @@ resource "redash_alert" "my_alert" {
 - `data_source_id` (Number)
 - `description` (String)
 - `id` (String) The ID of this resource.
+- `published` (Boolean)
 - `query` (String)
 - `schedule` (List of Object) (see [below for nested schema](#nestedatt--schedule))
 

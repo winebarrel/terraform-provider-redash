@@ -29,6 +29,10 @@ func dataSourceQuery() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"published": {
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
 			"schedule": {
 				Type:     schema.TypeList,
 				Computed: true,
