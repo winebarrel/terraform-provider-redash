@@ -26,6 +26,10 @@ func resourceQuery() *schema.Resource {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
+			"query_id": {
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
 			"name": {
 				Type:     schema.TypeString,
 				Required: true,
@@ -354,6 +358,7 @@ func readQuery0(ctx context.Context, d *schema.ResourceData, meta any) error {
 	}
 
 	d.Set("data_source_id", query.DataSourceID) //nolint:errcheck
+	d.Set("query_id", query.ID)                 //nolint:errcheck
 	d.Set("name", query.Name)                   //nolint:errcheck
 	d.Set("description", query.Description)     //nolint:errcheck
 	d.Set("query", query.Query)                 //nolint:errcheck
