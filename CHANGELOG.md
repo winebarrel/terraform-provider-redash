@@ -2,7 +2,7 @@
 
 ### Added
 
-* Add `publish` attr to `query` resource.
+* Add `publish` attr to `query` resource/data source.
 
 # Changelog
 
