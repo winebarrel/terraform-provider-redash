@@ -118,7 +118,11 @@ func createQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 		published := v.(bool)
 
 		if published {
-			client.PublishQuery(ctx, query.ID)
+			err = client.PublishQuery(ctx, query.ID)
+
+			if err != nil {
+				return diag.FromErr(err)
+			}
 		}
 	}
 
