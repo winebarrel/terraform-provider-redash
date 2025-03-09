@@ -1,3 +1,9 @@
+## [1.1.0] - 2025-03-09
+
+### Added
+
+* Add `publish` attr to `query` resource.
+
 # Changelog
 
 ## [1.0.0] - 2025-01-21
