@@ -160,42 +160,42 @@ func TestAccDataSoureceParamQuery_date(t *testing.T) {
 
 const testAccDataSoureceParamQueryConfigTextNum = testAccParamQueryConfigTextNum1 + `
 data "redash_query" "my_query" {
-	query_id = redash_query.my_query.id
-	name     = "my-query"
+  query_id = redash_query.my_query.id
+  name     = "my-query"
 }
 `
 
 const testAccDataSoureceParamQueryConfigRegex = testAccParamQueryConfigRegex + `
 data "redash_query" "my_query" {
-	query_id = redash_query.my_query.id
-	name     = "my-query"
+  query_id = redash_query.my_query.id
+  name     = "my-query"
 }
 `
 
 const testAccDataSoureceParamQueryConfigEnum = testAccParamQueryConfigEnum + `
 data "redash_query" "my_query" {
-	query_id = redash_query.my_query.id
-	name     = "my-query"
+  query_id = redash_query.my_query.id
+  name     = "my-query"
 }
 `
 
 const testAccDataSoureceParamQueryConfigEnumMultiValues = testAccParamQueryConfigEnumMultiValues2 + `
 data "redash_query" "my_query" {
-	query_id = redash_query.my_query.id
-	name     = "my-query"
+  query_id = redash_query.my_query.id
+  name     = "my-query"
 }
 `
 
 const testAccDataSoureceParamQueryConfigQuery = testAccParamQueryConfigQuery + `
 data "redash_query" "my_query" {
-	query_id = redash_query.my_query.id
-	name     = "my-query"
+  query_id = redash_query.my_query.id
+  name     = "my-query"
 }
 `
 
 const testAccDataSoureceParamQueryConfigDateTmpl = testAccParamQueryConfigDateTmpl + `
 data "redash_query" "my_query" {
-	query_id = redash_query.my_query.id
-	name     = "my-query"
+  query_id = redash_query.my_query.id
+  name     = "my-query"
 }
 `

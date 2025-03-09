@@ -297,9 +297,9 @@ resource "redash_query" "my_query" {
       name  = "enm"
       type  = "enum"
 
-			enum {
-				options = ["aaa", "bbb", "ccc"]
-			}
+      enum {
+        options = ["aaa", "bbb", "ccc"]
+      }
     }
   }
 }
@@ -317,11 +317,11 @@ resource "redash_query" "my_query" {
       name  = "enm"
       type  = "enum"
 
-			enum {
-				options = ["aaa", "bbb", "ccc"]
+      enum {
+        options = ["aaa", "bbb", "ccc"]
 
-				multi_values {}
-			}
+        multi_values {}
+      }
     }
   }
 }
@@ -339,14 +339,14 @@ resource "redash_query" "my_query" {
       name  = "enm"
       type  = "enum"
 
-			enum {
-				options = ["aaa", "bbb", "ccc"]
+      enum {
+        options = ["aaa", "bbb", "ccc"]
 
-				multi_values {
-					quotation = "'"
-					separator = ";"
-				}
-			}
+        multi_values {
+          quotation = "'"
+          separator = ";"
+        }
+      }
     }
   }
 }
@@ -370,7 +370,7 @@ resource "redash_query" "my_query" {
       title    = "tenum"
       name     = "q"
       type     = "query"
-			query_id = redash_query.select_array.id
+      query_id = redash_query.select_array.id
     }
   }
 }
