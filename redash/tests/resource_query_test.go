@@ -1,6 +1,9 @@
 package test
 
 import (
+	"errors"
+	"fmt"
+	"strconv"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -20,6 +23,16 @@ func TestAccQuery_basic(t *testing.T) {
 					resource.TestCheckNoResourceAttr("redash_query.my_query", "interval"),
 					resource.TestCheckNoResourceAttr("redash_query.my_query", "tags"),
 					resource.TestCheckResourceAttr("redash_query.my_query", "published", "false"),
+					resource.TestCheckResourceAttrWith("redash_query.my_query", "query_id", func(value string) error {
+						i, err := strconv.Atoi(value)
+						if err != nil {
+							return fmt.Errorf("query_id must be number: %w", err)
+						}
+						if i <= 0 {
+							return errors.New("query_id must be > 0")
+						}
+						return nil
+					}),
 				),
 			},
 			{

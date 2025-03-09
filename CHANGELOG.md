@@ -1,3 +1,9 @@
+## [1.2.0] - 2025-03-10
+
+### Added
+
+* Support parameterized query.
+
 ## [1.1.0] - 2025-03-09
 
 ### Added
