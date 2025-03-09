@@ -8,7 +8,7 @@ require (
 	github.com/hashicorp/terraform-plugin-docs v0.21.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.36.1
 	github.com/stretchr/testify v1.10.0
-	github.com/winebarrel/redash-go/v2 v2.6.0
+	github.com/winebarrel/redash-go/v2 v2.6.1
 )
 
 require (
