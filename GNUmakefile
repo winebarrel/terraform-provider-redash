@@ -40,6 +40,7 @@ tf-clean: clean
 .PHONY: redash-setup
 redash-setup:
 	psql -U postgres -h localhost -p 15432 -f etc/redash.sql
+	$(MAKE) redash-upgrade-db
 
 .PHONY: redash-upgrade-db
 redash-upgrade-db:
