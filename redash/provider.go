@@ -69,7 +69,7 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (any, diag.D
 		return nil, diag.FromErr(err)
 	}
 
-	client.Debug = logging.IsDebugOrHigher()
+	client.SetDebug(logging.IsDebugOrHigher())
 
 	return client, nil
 }
