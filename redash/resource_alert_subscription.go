@@ -98,5 +98,5 @@ func importAlertSubscription(ctx context.Context, d *schema.ResourceData, meta a
 		}
 	}
 
-	return nil, fmt.Errorf("Alert Subscription (alert_id=%d, alert_destination_id=%d) not found", alertId, destId)
+	return nil, fmt.Errorf("alert subscription (alert_id=%d, alert_destination_id=%d) not found", alertId, destId)
 }
