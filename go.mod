@@ -6,7 +6,7 @@ toolchain go1.25.1
 
 require (
 	github.com/hashicorp/terraform-plugin-docs v0.23.0
-	github.com/hashicorp/terraform-plugin-sdk/v2 v2.38.0
+	github.com/hashicorp/terraform-plugin-sdk/v2 v2.38.1
 	github.com/stretchr/testify v1.11.1
 	github.com/winebarrel/redash-go/v2 v2.7.0
 )
