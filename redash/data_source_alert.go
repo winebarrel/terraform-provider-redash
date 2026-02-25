@@ -35,7 +35,7 @@ func dataSourceAlert() *schema.Resource {
 							Computed: true,
 						},
 						"value": {
-							Type:     schema.TypeInt,
+							Type:     schema.TypeFloat,
 							Computed: true,
 						},
 						"custom_subject": {
