@@ -73,7 +73,7 @@ func resourceAlert() *schema.Resource {
 							},
 						},
 						"value": {
-							Type:     schema.TypeInt,
+							Type:     schema.TypeFloat,
 							Required: true,
 						},
 						"custom_subject": {
@@ -131,7 +131,7 @@ func createAlert(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 		Options: redashgo.CreateAlertOptions{
 			Column:        options["column"].(string),
 			Op:            options["op"].(string),
-			Value:         options["value"].(int),
+			Value:         options["value"].(float64),
 			CustomSubject: options["custom_subject"].(string),
 			CustomBody:    options["custom_body"].(string),
 			Template:      options["template"].(string),
@@ -216,7 +216,7 @@ func updateAlert(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 	input.Options = &redashgo.UpdateAlertOptions{
 		Column:        options["column"].(string),
 		Op:            options["op"].(string),
-		Value:         options["value"].(int),
+		Value:         options["value"].(float64),
 		CustomSubject: options["custom_subject"].(string),
 		CustomBody:    options["custom_body"].(string),
 		Template:      options["template"].(string),
