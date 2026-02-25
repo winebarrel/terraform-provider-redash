@@ -1,3 +1,10 @@
+## [1.3.0] - 2026-02-25
+
+### Changed
+
+* Update redash-go to [v2.9.0](https://github.com/winebarrel/redash-go/blob/main/CHANGELOG.md#290---2026-02-25).
+* Change alert value schema from TypeInt to TypeFloat. [pull#143](https://github.com/winebarrel/terraform-provider-redash/pull/143)
+
 ## [1.2.0] - 2025-03-10
 
 ### Added
