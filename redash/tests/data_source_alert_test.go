@@ -23,7 +23,7 @@ func TestAccDataAlert_basic(t *testing.T) {
 					resource.TestCheckTypeSetElemNestedAttrs("data.redash_alert.my_alert", "options.*", map[string]string{
 						"column":         "?column?",
 						"op":             "<",
-						"value":          "3",
+						"value":          "1.5",
 						"custom_subject": "subject",
 						"custom_body":    "body",
 						"template":       "",
@@ -41,7 +41,7 @@ resource "redash_alert" "my_alert" {
   options {
     column         = "?column?"
     op             = "<"
-    value          = 3
+    value          = 1.5
 		custom_subject = "subject"
 		custom_body    = "body"
   }
