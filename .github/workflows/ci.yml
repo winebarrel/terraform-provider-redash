@@ -21,7 +21,7 @@ jobs:
       - uses: golangci/golangci-lint-action@v9
       - name: Start services
         run: |
-          for i in {1..60}; do docker compose up -d && break; sleep 1; done
+          for i in {1..60}; do docker compose up -d --quiet-pull && break; sleep 1; done
           for i in {1..60}; do pg_isready -U postgres -h 127.0.0.1 -p 15432 && break; sleep 1; done
       - run: make redash-setup
       - run: make redash-upgrade-db
