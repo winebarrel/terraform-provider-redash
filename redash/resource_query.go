@@ -430,11 +430,12 @@ func updateQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 	isDraft := !d.Get("published").(bool)
 
 	input := &redashgo.UpdateQueryInput{
-		DataSourceID: d.Get("data_source_id").(int),
-		Name:         d.Get("name").(string),
-		Description:  d.Get("description").(string),
-		Query:        d.Get("query").(string),
-		IsDraft:      &isDraft,
+		DataSourceID:            d.Get("data_source_id").(int),
+		Name:                    d.Get("name").(string),
+		Description:             d.Get("description").(string),
+		Query:                   d.Get("query").(string),
+		IsDraft:                 &isDraft,
+		WithoutOmittingSchedule: true,
 	}
 
 	schedules := d.Get("schedule").([]any)
