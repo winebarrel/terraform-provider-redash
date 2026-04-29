@@ -278,7 +278,6 @@ func createQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 		Name:         d.Get("name").(string),
 		Description:  d.Get("description").(string),
 		Query:        d.Get("query").(string),
-		Schedule:     &redashgo.CreateQueryInputSchedule{},
 	}
 
 	if v, ok := d.GetOk("schedule"); ok {
@@ -286,7 +285,9 @@ func createQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 
 		if len(schedules) == 1 {
 			schedule := schedules[0].(map[string]any)
-			input.Schedule.Interval = schedule["interval"].(int)
+			input.Schedule = &redashgo.CreateQueryInputSchedule{
+				Interval: schedule["interval"].(int),
+			}
 		}
 	}
 
@@ -433,7 +434,6 @@ func updateQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 		Name:         d.Get("name").(string),
 		Description:  d.Get("description").(string),
 		Query:        d.Get("query").(string),
-		Schedule:     &redashgo.UpdateQueryInputSchedule{},
 		IsDraft:      &isDraft,
 	}
 
@@ -441,7 +441,9 @@ func updateQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 
 	if len(schedules) == 1 {
 		schedule := schedules[0].(map[string]any)
-		input.Schedule.Interval = schedule["interval"].(int)
+		input.Schedule = &redashgo.UpdateQueryInputSchedule{
+			Interval: schedule["interval"].(int),
+		}
 	}
 
 	queryParams := getQueryOptions(d)

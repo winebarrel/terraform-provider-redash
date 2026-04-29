@@ -22,6 +22,7 @@ func TestAccQuery_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("redash_query.my_query", "query", "select 1"),
 					resource.TestCheckNoResourceAttr("redash_query.my_query", "interval"),
 					resource.TestCheckNoResourceAttr("redash_query.my_query", "tags"),
+					resource.TestCheckResourceAttr("redash_query.my_query", "schedule.#", "0"),
 					resource.TestCheckResourceAttr("redash_query.my_query", "published", "false"),
 					resource.TestCheckResourceAttrWith("redash_query.my_query", "query_id", func(value string) error {
 						i, err := strconv.Atoi(value)
@@ -56,6 +57,7 @@ func TestAccQuery_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("redash_query.my_query", "query", "select 1"),
 					resource.TestCheckNoResourceAttr("redash_query.my_query", "interval"),
 					resource.TestCheckNoResourceAttr("redash_query.my_query", "tags"),
+					resource.TestCheckResourceAttr("redash_query.my_query", "schedule.#", "0"),
 				),
 			},
 			{
@@ -65,6 +67,7 @@ func TestAccQuery_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("redash_query.my_query", "description", "my-query desc"),
 					resource.TestCheckResourceAttr("redash_query.my_query", "query", "select 1"),
 					resource.TestCheckNoResourceAttr("redash_query.my_query", "interval"),
+					resource.TestCheckResourceAttr("redash_query.my_query", "schedule.#", "0"),
 					resource.TestCheckResourceAttr("redash_query.my_query", "tags.#", "2"),
 					resource.TestCheckResourceAttr("redash_query.my_query", "tags.0", "foo"),
 					resource.TestCheckResourceAttr("redash_query.my_query", "tags.1", "bar"),
