@@ -1,3 +1,11 @@
+## [1.4.0] - 2026-04-29
+
+### Changed
+
+* Update redash-go to [v2.10.0](https://github.com/winebarrel/redash-go/blob/main/CHANGELOG.md#2100---2026-04-29).
+* Don't send schedule with interval 0 for queries without schedule block. [pull#149](https://github.com/winebarrel/terraform-provider-redash/pull/149)
+* Clear schedule on update when schedule block is removed. [pull#152](https://github.com/winebarrel/terraform-provider-redash/pull/152)
+
 ## [1.3.0] - 2026-02-25
 
 ### Changed
