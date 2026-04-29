@@ -50,6 +50,14 @@ func TestAccQuery_basic(t *testing.T) {
 				),
 			},
 			{
+				Config: testAccQueryConfigBasic3,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckTypeSetElemNestedAttrs("redash_query.my_query", "schedule.*", map[string]string{
+						"interval": "1200",
+					}),
+				),
+			},
+			{
 				Config: testAccQueryConfigBasic,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("redash_query.my_query", "name", "my-query"),
@@ -58,6 +66,14 @@ func TestAccQuery_basic(t *testing.T) {
 					resource.TestCheckNoResourceAttr("redash_query.my_query", "interval"),
 					resource.TestCheckNoResourceAttr("redash_query.my_query", "tags"),
 					resource.TestCheckResourceAttr("redash_query.my_query", "schedule.#", "0"),
+				),
+			},
+			{
+				Config: testAccQueryConfigBasic2,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckTypeSetElemNestedAttrs("redash_query.my_query", "schedule.*", map[string]string{
+						"interval": "600",
+					}),
 				),
 			},
 			{
@@ -136,6 +152,18 @@ resource "redash_query" "my_query" {
 	query          = "select 2"
 	schedule {
 		interval = 600
+	}
+}
+`
+
+const testAccQueryConfigBasic3 = testAccDataSourceConfigBasicPg + `
+resource "redash_query" "my_query" {
+	data_source_id = redash_data_source.my_data_source.id
+	name           = "my-query2"
+	description    = "my-query desc2"
+	query          = "select 2"
+	schedule {
+		interval = 1200
 	}
 }
 `
