@@ -2,7 +2,7 @@ module github.com/winebarrel/terraform-provider-redash
 
 go 1.25.8
 
-toolchain go1.26.3
+toolchain go1.26.4
 
 require (
 	github.com/hashicorp/terraform-plugin-docs v0.25.0
