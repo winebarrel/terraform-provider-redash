@@ -134,7 +134,7 @@ func createAlert(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 			Value:         options["value"].(float64),
 			CustomSubject: options["custom_subject"].(string),
 			CustomBody:    options["custom_body"].(string),
-			Template:      options["template"].(string),
+			Template:      options["template"].(string), //nolint:staticcheck
 		},
 	}
 
@@ -219,7 +219,7 @@ func updateAlert(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 		Value:         options["value"].(float64),
 		CustomSubject: options["custom_subject"].(string),
 		CustomBody:    options["custom_body"].(string),
-		Template:      options["template"].(string),
+		Template:      options["template"].(string), //nolint:staticcheck
 	}
 
 	_, err := client.UpdateAlert(ctx, id, input)

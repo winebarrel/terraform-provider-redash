@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	testAccProviders map[string]*schema.Provider
-	testAccProvider  *schema.Provider
+	testAccProviderFactories map[string]func() (*schema.Provider, error)
+	testAccProvider          *schema.Provider
 )
 
 const (
@@ -22,10 +22,11 @@ const (
 
 func init() {
 	testAccProvider = redash.Provider()
-	testAccProviders = map[string]*schema.Provider{
-		"redash": testAccProvider,
+	testAccProviderFactories = map[string]func() (*schema.Provider, error){
+		"redash": func() (*schema.Provider, error) {
+			return testAccProvider, nil
+		},
 	}
-
 }
 
 func testAccPreCheck(t *testing.T) {
