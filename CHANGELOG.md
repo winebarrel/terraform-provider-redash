@@ -1,3 +1,9 @@
+## [1.5.0] - 2026-09-11
+
+### Fixed
+
+* Fix permanent drift on `data_source` resource options with secrets. [pull#178](https://github.com/winebarrel/terraform-provider-redash/pull/178)
+
 ## [1.4.0] - 2026-04-29
 
 ### Changed
