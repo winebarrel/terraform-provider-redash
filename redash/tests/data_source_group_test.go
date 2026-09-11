@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccDataSoureceGroup_basic(t *testing.T) {
+func TestAccDataSourceGroup_basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		ProviderFactories: testAccProviderFactories,
 		PreCheck:          func() { testAccPreCheck(t) },
@@ -15,7 +15,7 @@ func TestAccDataSoureceGroup_basic(t *testing.T) {
 				Config: testAccGroupConfigBasic,
 			},
 			{
-				Config: testAccDataSoureceGroupConfigBasic,
+				Config: testAccDataSourceGroupConfigBasic,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.redash_group.my_group", "name", "my-group"),
 				),
@@ -24,7 +24,7 @@ func TestAccDataSoureceGroup_basic(t *testing.T) {
 	})
 }
 
-const testAccDataSoureceGroupConfigBasic = testAccGroupConfigBasic + `
+const testAccDataSourceGroupConfigBasic = testAccGroupConfigBasic + `
 data "redash_group" "my_group" {
   name = "my-group"
 }

@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccDataSoureceParamQuery_basic(t *testing.T) {
+func TestAccDataSourceParamQuery_basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		ProviderFactories: testAccProviderFactories,
 		PreCheck:          func() { testAccPreCheck(t) },
@@ -18,7 +18,7 @@ func TestAccDataSoureceParamQuery_basic(t *testing.T) {
 				Config: testAccParamQueryConfigTextNum1,
 			},
 			{
-				Config: testAccDataSoureceParamQueryConfigTextNum,
+				Config: testAccDataSourceParamQueryConfigTextNum,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.redash_query.my_query", "name", "my-query"),
 					resource.TestCheckResourceAttr("data.redash_query.my_query", "description", "my-query desc"),
@@ -38,7 +38,7 @@ func TestAccDataSoureceParamQuery_basic(t *testing.T) {
 				Config: testAccParamQueryConfigRegex,
 			},
 			{
-				Config: testAccDataSoureceParamQueryConfigRegex,
+				Config: testAccDataSourceParamQueryConfigRegex,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.redash_query.my_query", "name", "my-query"),
 					resource.TestCheckResourceAttr("data.redash_query.my_query", "description", "my-query desc"),
@@ -54,7 +54,7 @@ func TestAccDataSoureceParamQuery_basic(t *testing.T) {
 				Config: testAccParamQueryConfigEnum,
 			},
 			{
-				Config: testAccDataSoureceParamQueryConfigEnum,
+				Config: testAccDataSourceParamQueryConfigEnum,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.redash_query.my_query", "name", "my-query"),
 					resource.TestCheckResourceAttr("data.redash_query.my_query", "description", "my-query desc"),
@@ -73,7 +73,7 @@ func TestAccDataSoureceParamQuery_basic(t *testing.T) {
 				Config: testAccParamQueryConfigEnumMultiValues2,
 			},
 			{
-				Config: testAccDataSoureceParamQueryConfigEnumMultiValues,
+				Config: testAccDataSourceParamQueryConfigEnumMultiValues,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.redash_query.my_query", "name", "my-query"),
 					resource.TestCheckResourceAttr("data.redash_query.my_query", "description", "my-query desc"),
@@ -95,7 +95,7 @@ func TestAccDataSoureceParamQuery_basic(t *testing.T) {
 				Config: testAccParamQueryConfigQuery,
 			},
 			{
-				Config: testAccDataSoureceParamQueryConfigQuery,
+				Config: testAccDataSourceParamQueryConfigQuery,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.redash_query.my_query", "name", "my-query"),
 					resource.TestCheckResourceAttr("data.redash_query.my_query", "description", "my-query desc"),
@@ -120,7 +120,7 @@ func TestAccDataSoureceParamQuery_basic(t *testing.T) {
 	})
 }
 
-func TestAccDataSoureceParamQuery_date(t *testing.T) {
+func TestAccDataSourceParamQuery_date(t *testing.T) {
 	types := []string{
 		"date",
 		"datetime-local",
@@ -138,7 +138,7 @@ func TestAccDataSoureceParamQuery_date(t *testing.T) {
 		})
 
 		steps = append(steps, resource.TestStep{
-			Config: fmt.Sprintf(testAccDataSoureceParamQueryConfigDateTmpl, t, t, t, t),
+			Config: fmt.Sprintf(testAccDataSourceParamQueryConfigDateTmpl, t, t, t, t),
 			Check: resource.ComposeTestCheckFunc(
 				resource.TestCheckResourceAttr("data.redash_query.my_query", "name", "my-query"),
 				resource.TestCheckResourceAttr("data.redash_query.my_query", "description", "my-query desc"),
@@ -158,42 +158,42 @@ func TestAccDataSoureceParamQuery_date(t *testing.T) {
 	})
 }
 
-const testAccDataSoureceParamQueryConfigTextNum = testAccParamQueryConfigTextNum1 + `
+const testAccDataSourceParamQueryConfigTextNum = testAccParamQueryConfigTextNum1 + `
 data "redash_query" "my_query" {
   query_id = redash_query.my_query.id
   name     = "my-query"
 }
 `
 
-const testAccDataSoureceParamQueryConfigRegex = testAccParamQueryConfigRegex + `
+const testAccDataSourceParamQueryConfigRegex = testAccParamQueryConfigRegex + `
 data "redash_query" "my_query" {
   query_id = redash_query.my_query.id
   name     = "my-query"
 }
 `
 
-const testAccDataSoureceParamQueryConfigEnum = testAccParamQueryConfigEnum + `
+const testAccDataSourceParamQueryConfigEnum = testAccParamQueryConfigEnum + `
 data "redash_query" "my_query" {
   query_id = redash_query.my_query.id
   name     = "my-query"
 }
 `
 
-const testAccDataSoureceParamQueryConfigEnumMultiValues = testAccParamQueryConfigEnumMultiValues2 + `
+const testAccDataSourceParamQueryConfigEnumMultiValues = testAccParamQueryConfigEnumMultiValues2 + `
 data "redash_query" "my_query" {
   query_id = redash_query.my_query.id
   name     = "my-query"
 }
 `
 
-const testAccDataSoureceParamQueryConfigQuery = testAccParamQueryConfigQuery + `
+const testAccDataSourceParamQueryConfigQuery = testAccParamQueryConfigQuery + `
 data "redash_query" "my_query" {
   query_id = redash_query.my_query.id
   name     = "my-query"
 }
 `
 
-const testAccDataSoureceParamQueryConfigDateTmpl = testAccParamQueryConfigDateTmpl + `
+const testAccDataSourceParamQueryConfigDateTmpl = testAccParamQueryConfigDateTmpl + `
 data "redash_query" "my_query" {
   query_id = redash_query.my_query.id
   name     = "my-query"
