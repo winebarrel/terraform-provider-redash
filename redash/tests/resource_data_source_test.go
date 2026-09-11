@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccDataSourece_basic(t *testing.T) {
+func TestAccDataSource_basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		ProviderFactories: testAccProviderFactories,
 		PreCheck:          func() { testAccPreCheck(t) },
@@ -31,7 +31,7 @@ func TestAccDataSourece_basic(t *testing.T) {
 	})
 }
 
-func TestAccDataSourece_secret(t *testing.T) {
+func TestAccDataSource_secret(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		ProviderFactories: testAccProviderFactories,
 		PreCheck:          func() { testAccPreCheck(t) },

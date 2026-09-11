@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccDataSoureceQuery_basic(t *testing.T) {
+func TestAccDataSourceQuery_basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		ProviderFactories: testAccProviderFactories,
 		PreCheck:          func() { testAccPreCheck(t) },
@@ -15,7 +15,7 @@ func TestAccDataSoureceQuery_basic(t *testing.T) {
 				Config: testAccQueryConfigBasic2,
 			},
 			{
-				Config: testAccDataSoureceQueryConfigBasic,
+				Config: testAccDataSourceQueryConfigBasic,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.redash_query.my_query", "name", "my-query2"),
 					resource.TestCheckResourceAttr("data.redash_query.my_query", "description", "my-query desc2"),
@@ -31,7 +31,7 @@ func TestAccDataSoureceQuery_basic(t *testing.T) {
 				Config: testAccQueryConfigWithTags,
 			},
 			{
-				Config: testAccDataSoureceQueryConfigWithTags,
+				Config: testAccDataSourceQueryConfigWithTags,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.redash_query.my_query", "name", "my-query2"),
 					resource.TestCheckResourceAttr("data.redash_query.my_query", "description", "my-query2 desc"),
@@ -48,7 +48,7 @@ func TestAccDataSoureceQuery_basic(t *testing.T) {
 				Config: testAccQueryConfigWithPublish,
 			},
 			{
-				Config: testAccDataSoureceQueryConfigWithPublish,
+				Config: testAccDataSourceQueryConfigWithPublish,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.redash_query.my_query", "name", "my-query"),
 					resource.TestCheckResourceAttr("data.redash_query.my_query", "description", "my-query desc"),
@@ -62,19 +62,19 @@ func TestAccDataSoureceQuery_basic(t *testing.T) {
 	})
 }
 
-const testAccDataSoureceQueryConfigBasic = testAccQueryConfigBasic2 + `
+const testAccDataSourceQueryConfigBasic = testAccQueryConfigBasic2 + `
 data "redash_query" "my_query" {
   name = "my-query2"
 }
 `
 
-const testAccDataSoureceQueryConfigWithTags = testAccQueryConfigWithTags + `
+const testAccDataSourceQueryConfigWithTags = testAccQueryConfigWithTags + `
 data "redash_query" "my_query" {
   name = "my-query2"
 }
 `
 
-const testAccDataSoureceQueryConfigWithPublish = testAccQueryConfigWithPublish + `
+const testAccDataSourceQueryConfigWithPublish = testAccQueryConfigWithPublish + `
 data "redash_query" "my_query" {
   name = "my-query"
 }

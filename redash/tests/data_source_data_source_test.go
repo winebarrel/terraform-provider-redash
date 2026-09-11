@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccDataSoureceDataSourece_basic(t *testing.T) {
+func TestAccDataSourceDataSource_basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		ProviderFactories: testAccProviderFactories,
 		PreCheck:          func() { testAccPreCheck(t) },
@@ -15,7 +15,7 @@ func TestAccDataSoureceDataSourece_basic(t *testing.T) {
 				Config: testAccDataSourceConfigBasicPg,
 			},
 			{
-				Config: testAccDataSoureceDataSourceConfigBasicPg,
+				Config: testAccDataSourceDataSourceConfigBasicPg,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.redash_data_source.my_data_source", "name", "my-data-source"),
 					resource.TestCheckResourceAttr("data.redash_data_source.my_data_source", "type", "pg"),
@@ -26,7 +26,7 @@ func TestAccDataSoureceDataSourece_basic(t *testing.T) {
 	})
 }
 
-const testAccDataSoureceDataSourceConfigBasicPg = testAccDataSourceConfigBasicPg + `
+const testAccDataSourceDataSourceConfigBasicPg = testAccDataSourceConfigBasicPg + `
 data "redash_data_source" "my_data_source" {
   name = "my-data-source"
 }

@@ -15,7 +15,7 @@ func TestAccGroupMember_basic(t *testing.T) {
 		PreCheck:          func() { testAccPreCheck(t) },
 		Steps: []resource.TestStep{
 			{
-				Config: testAccGroupConfigBasic + testAccDataSoureceUserConfigName,
+				Config: testAccGroupConfigBasic + testAccDataSourceUserConfigName,
 			},
 			{
 				Config: testAccGroupMemberBasic,
@@ -27,7 +27,7 @@ func TestAccGroupMember_basic(t *testing.T) {
 	})
 }
 
-const testAccGroupMemberBasic = testAccGroupConfigBasic + testAccDataSoureceUserConfigName + `
+const testAccGroupMemberBasic = testAccGroupConfigBasic + testAccDataSourceUserConfigName + `
 resource "redash_group_member" "my_member" {
 	group_id = redash_group.my_group.id
 	user_id  = data.redash_user.admin.id

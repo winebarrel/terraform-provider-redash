@@ -6,20 +6,20 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccDataSoureceUser_basic(t *testing.T) {
+func TestAccDataSourceUser_basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		ProviderFactories: testAccProviderFactories,
 		PreCheck:          func() { testAccPreCheck(t) },
 		Steps: []resource.TestStep{
 			{
-				Config: testAccDataSoureceUserConfigName,
+				Config: testAccDataSourceUserConfigName,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.redash_user.admin", "name", "admin"),
 					resource.TestCheckResourceAttr("data.redash_user.admin", "email", "admin@example.com"),
 				),
 			},
 			{
-				Config: testAccDataSoureceUserConfigEmail,
+				Config: testAccDataSourceUserConfigEmail,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.redash_user.admin", "name", "admin"),
 					resource.TestCheckResourceAttr("data.redash_user.admin", "email", "admin@example.com"),
@@ -29,13 +29,13 @@ func TestAccDataSoureceUser_basic(t *testing.T) {
 	})
 }
 
-const testAccDataSoureceUserConfigName = `
+const testAccDataSourceUserConfigName = `
 data "redash_user" "admin" {
   name = "admin"
 }
 `
 
-const testAccDataSoureceUserConfigEmail = `
+const testAccDataSourceUserConfigEmail = `
 data "redash_user" "admin" {
   email = "admin@example.com"
 }

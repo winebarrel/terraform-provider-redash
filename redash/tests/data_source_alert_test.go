@@ -12,10 +12,10 @@ func TestAccDataAlert_basic(t *testing.T) {
 		PreCheck:          func() { testAccPreCheck(t) },
 		Steps: []resource.TestStep{
 			{
-				Config: testAccDataSoureceAlertBasic0,
+				Config: testAccDataSourceAlertBasic0,
 			},
 			{
-				Config: testAccDataSoureceAlertBasic,
+				Config: testAccDataSourceAlertBasic,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.redash_alert.my_alert", "name", "my-alert"),
 					resource.TestCheckResourceAttr("data.redash_alert.my_alert", "rearm", "300"),
@@ -34,7 +34,7 @@ func TestAccDataAlert_basic(t *testing.T) {
 	})
 }
 
-const testAccDataSoureceAlertBasic0 = testAccQueryConfigBasic + `
+const testAccDataSourceAlertBasic0 = testAccQueryConfigBasic + `
 resource "redash_alert" "my_alert" {
   name     = "my-alert"
   query_id = redash_query.my_query.id
@@ -50,7 +50,7 @@ resource "redash_alert" "my_alert" {
 }
 `
 
-const testAccDataSoureceAlertBasic = testAccDataSoureceAlertBasic0 + `
+const testAccDataSourceAlertBasic = testAccDataSourceAlertBasic0 + `
 data "redash_alert" "my_alert" {
   name = "my-alert"
 }
