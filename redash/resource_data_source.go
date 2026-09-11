@@ -10,6 +10,11 @@ import (
 	redashgo "github.com/winebarrel/redash-go/v2"
 )
 
+// Redash masks secret option values (e.g. "password") with this fixed
+// placeholder in API responses. The real values are never returned.
+// cf. https://github.com/getredash/redash/blob/master/redash/utils/configuration.py
+const secretPlaceholder = "--------"
+
 func resourceDataSource() *schema.Resource {
 	return &schema.Resource{
 		CreateContext: createDataSource,
@@ -93,6 +98,24 @@ func readDataSource0(ctx context.Context, d *schema.ResourceData, meta any) erro
 
 	d.Set("name", ds.Name) //nolint:errcheck
 	d.Set("type", ds.Type) //nolint:errcheck
+
+	// The API masks secret values with a placeholder. Writing the placeholder
+	// to the state would cause permanent drift against the configuration, so
+	// keep the values already in the state for masked keys.
+	// cf. https://github.com/winebarrel/terraform-provider-redash/issues/177
+	if v, ok := d.GetOk("options"); ok {
+		stateOptions := map[string]any{}
+
+		if err := json.Unmarshal([]byte(v.(string)), &stateOptions); err == nil {
+			for key, value := range ds.Options {
+				if value == secretPlaceholder {
+					if stateValue, ok := stateOptions[key]; ok {
+						ds.Options[key] = stateValue
+					}
+				}
+			}
+		}
+	}
 
 	options, err := json.Marshal(ds.Options)
 
