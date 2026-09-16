@@ -24,6 +24,13 @@ var (
 		"less than",
 		"equals",
 	}
+
+	// cf. https://github.com/getredash/redash/blob/v26.3.0/client/app/pages/alert/components/Criteria.jsx#L101-L109
+	alertSelectors = []string{
+		"first",
+		"min",
+		"max",
+	}
 )
 
 func resourceAlert() *schema.Resource {
@@ -75,6 +82,26 @@ func resourceAlert() *schema.Resource {
 						"value": {
 							Type:     schema.TypeFloat,
 							Required: true,
+						},
+						"selector": {
+							Type:     schema.TypeString,
+							Optional: true,
+							// Redash raises KeyError while rendering custom_subject/custom_body if this key is absent.
+							// cf. https://github.com/getredash/redash/blob/v26.3.0/redash/models/__init__.py#L1074
+							Default: "first",
+							ValidateFunc: func(val any, key string) (warns []string, errs []error) {
+								v := val.(string)
+
+								for _, selector := range alertSelectors {
+									if selector == v {
+										return
+									}
+								}
+
+								errs = append(errs, fmt.Errorf("must be a valid selector (%s), got: %s", strings.Join(alertSelectors, ","), v))
+
+								return
+							},
 						},
 						"custom_subject": {
 							Type:     schema.TypeString,
@@ -132,6 +159,7 @@ func createAlert(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 			Column:        options["column"].(string),
 			Op:            options["op"].(string),
 			Value:         options["value"].(float64),
+			Selector:      options["selector"].(string),
 			CustomSubject: options["custom_subject"].(string),
 			CustomBody:    options["custom_body"].(string),
 			Template:      options["template"].(string), //nolint:staticcheck
@@ -190,6 +218,7 @@ func readAlert0(ctx context.Context, d *schema.ResourceData, meta any) error {
 		"column":         alert.Options.Column,
 		"op":             alert.Options.Op,
 		"value":          alert.Options.Value,
+		"selector":       alert.Options.Selector,
 		"custom_subject": alert.Options.CustomSubject,
 		"custom_body":    alert.Options.CustomBody,
 		"template":       alert.Options.Template, //nolint:staticcheck
@@ -217,6 +246,7 @@ func updateAlert(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 		Column:        options["column"].(string),
 		Op:            options["op"].(string),
 		Value:         options["value"].(float64),
+		Selector:      options["selector"].(string),
 		CustomSubject: options["custom_subject"].(string),
 		CustomBody:    options["custom_body"].(string),
 		Template:      options["template"].(string), //nolint:staticcheck
