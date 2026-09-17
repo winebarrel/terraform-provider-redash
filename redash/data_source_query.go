@@ -146,7 +146,6 @@ func readQueryByName(ctx context.Context, d *schema.ResourceData, meta any) diag
 
 	if queryId != nil {
 		query, err := client.GetQuery(ctx, *queryId)
-
 		if err != nil {
 			return diag.Errorf("Query not found: %s", err)
 		}
@@ -167,7 +166,6 @@ func readQueryByName(ctx context.Context, d *schema.ResourceData, meta any) diag
 
 	for {
 		rs, err := client.ListQueries(ctx, input)
-
 		if err != nil {
 			return diag.FromErr(err)
 		}

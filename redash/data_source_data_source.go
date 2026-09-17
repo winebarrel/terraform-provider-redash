@@ -33,7 +33,6 @@ func readDataSourceByName(ctx context.Context, d *schema.ResourceData, meta any)
 	client := meta.(*redashgo.Client)
 	name := d.Get("name").(string)
 	dsList, err := client.ListDataSources(ctx)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}

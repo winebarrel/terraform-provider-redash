@@ -74,7 +74,6 @@ func readAlertByName(ctx context.Context, d *schema.ResourceData, meta any) diag
 	client := meta.(*redashgo.Client)
 	name := d.Get("name").(string)
 	alerts, err := client.ListAlerts(ctx)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}

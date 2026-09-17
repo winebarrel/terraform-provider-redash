@@ -33,7 +33,6 @@ func readAlertDestinationByName(ctx context.Context, d *schema.ResourceData, met
 	client := meta.(*redashgo.Client)
 	name := d.Get("name").(string)
 	dests, err := client.ListDestinations(ctx)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}

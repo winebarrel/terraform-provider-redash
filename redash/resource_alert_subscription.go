@@ -40,7 +40,6 @@ func createAlertSubscription(ctx context.Context, d *schema.ResourceData, meta a
 	alertId := d.Get("alert_id").(int)
 	destId := d.Get("alert_destination_id").(int)
 	subs, err := client.AddAlertSubscription(ctx, alertId, destId)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -57,7 +56,6 @@ func deleteAlertSubscription(ctx context.Context, d *schema.ResourceData, meta a
 	client := meta.(*redashgo.Client)
 
 	err := client.RemoveAlertSubscription(ctx, alertId, subsId)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -70,13 +68,11 @@ func deleteAlertSubscription(ctx context.Context, d *schema.ResourceData, meta a
 func importAlertSubscription(ctx context.Context, d *schema.ResourceData, meta any) ([]*schema.ResourceData, error) {
 	alertDestId := strings.SplitN(d.Id(), "/", 2)
 	alertId, err := strconv.Atoi(alertDestId[0])
-
 	if err != nil {
 		return nil, err
 	}
 
 	destId, err := strconv.Atoi(alertDestId[1])
-
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +80,6 @@ func importAlertSubscription(ctx context.Context, d *schema.ResourceData, meta a
 	client := meta.(*redashgo.Client)
 
 	subsList, err := client.ListAlertSubscriptions(ctx, alertId)
-
 	if err != nil {
 		return nil, err
 	}
