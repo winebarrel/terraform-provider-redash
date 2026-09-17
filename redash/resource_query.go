@@ -91,8 +91,9 @@ func resourceQuery() *schema.Resource {
 										Optional: true,
 									},
 									"type": {
-										Type:     schema.TypeString,
-										Required: true,
+										Description: "Valid values: `text`, `text-pattern`, `number`, `enum`, `query`, `date`, `datetime-local`, `datetime-with-seconds`, `date-range`, `datetime-range`, `datetime-range-with-seconds`.",
+										Type:        schema.TypeString,
+										Required:    true,
 										ValidateFunc: validation.StringInSlice([]string{
 											"text",
 											"text-pattern",
@@ -136,6 +137,7 @@ func resourceQuery() *schema.Resource {
 													Elem: &schema.Resource{
 														Schema: map[string]*schema.Schema{
 															"quotation": {
+																Description:  "Valid values: `\"`, `'`.",
 																Type:         schema.TypeString,
 																Optional:     true,
 																ValidateFunc: validation.StringInSlice([]string{`"`, `'`}, false),

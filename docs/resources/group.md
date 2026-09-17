@@ -33,6 +33,8 @@ resource "redash_group" "my_group" {
 
 Import is supported using the following syntax:
 
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
 terraform import redash_group.my_group 111 # Group ID
 ```

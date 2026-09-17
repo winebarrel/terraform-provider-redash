@@ -62,8 +62,9 @@ func resourceAlert() *schema.Resource {
 							Required: true,
 						},
 						"op": {
-							Type:     schema.TypeString,
-							Required: true,
+							Description: "Valid values: `>`, `>=`, `<`, `<=`, `==`, `!=`, `greater than`, `less than`, `equals`.",
+							Type:        schema.TypeString,
+							Required:    true,
 							// cf. https://github.com/getredash/redash/blob/v10.1.0/redash/models/__init__.py#L923
 							ValidateFunc: validation.StringInSlice(alertOperators, false),
 						},
@@ -72,8 +73,9 @@ func resourceAlert() *schema.Resource {
 							Required: true,
 						},
 						"selector": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Description: "Valid values: `first`, `min`, `max`.",
+							Type:        schema.TypeString,
+							Optional:    true,
 							// Redash raises KeyError while rendering custom_subject/custom_body if this key is absent.
 							// cf. https://github.com/getredash/redash/blob/v26.3.0/redash/models/__init__.py#L1074
 							Default:      "first",
