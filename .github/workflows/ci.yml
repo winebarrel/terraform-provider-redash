@@ -19,6 +19,7 @@ jobs:
           go-version-file: go.mod
           cache: false
       - uses: golangci/golangci-lint-action@v9
+      - run: make docs && git diff --exit-code
       - name: Start services
         run: |
           for i in {1..60}; do docker compose up -d --quiet-pull && break; sleep 1; done
