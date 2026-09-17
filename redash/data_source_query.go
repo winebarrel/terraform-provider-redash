@@ -183,7 +183,7 @@ func readQueryByName(ctx context.Context, d *schema.ResourceData, meta any) diag
 			break
 		}
 
-		input.PageSize++
+		input.Page++
 	}
 
 	return diag.Errorf("Query (%s) not found", name)
