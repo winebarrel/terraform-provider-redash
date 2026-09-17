@@ -37,10 +37,11 @@ func testAccPreCheck(t *testing.T) {
 
 func TestProvider(t *testing.T) {
 	assert := assert.New(t)
+	require := require.New(t)
 
 	provider := redash.Provider()
 	err := provider.InternalValidate()
-	require.NoError(t, err)
+	require.NoError(err)
 
 	raw := map[string]any{
 		"url":     "https://example.com",
@@ -53,10 +54,11 @@ func TestProvider(t *testing.T) {
 
 func TestProvider_withoutURL(t *testing.T) {
 	assert := assert.New(t)
+	require := require.New(t)
 
 	provider := redash.Provider()
 	err := provider.InternalValidate()
-	require.NoError(t, err)
+	require.NoError(err)
 
 	raw := map[string]any{
 		"api_key": "api_key",
@@ -69,10 +71,11 @@ func TestProvider_withoutURL(t *testing.T) {
 
 func TestProvider_withoutAPIKey(t *testing.T) {
 	assert := assert.New(t)
+	require := require.New(t)
 
 	provider := redash.Provider()
 	err := provider.InternalValidate()
-	require.NoError(t, err)
+	require.NoError(err)
 
 	raw := map[string]any{
 		"url": "https://example.com",
