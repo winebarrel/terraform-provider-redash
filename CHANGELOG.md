@@ -1,3 +1,14 @@
+## [1.7.0] - 2026-09-17
+
+### Changed
+
+* Update Go to 1.27. [pull#187](https://github.com/winebarrel/terraform-provider-redash/pull/187)
+* Return an error instead of panicking on malformed import IDs. [pull#187](https://github.com/winebarrel/terraform-provider-redash/pull/187)
+
+### Fixed
+
+* Fix pagination in `redash_query` data source. [pull#186](https://github.com/winebarrel/terraform-provider-redash/pull/186)
+
 ## [1.6.0] - 2026-09-17
 
 ### Changed
