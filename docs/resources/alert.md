@@ -67,6 +67,7 @@ Optional:
 
 - `custom_body` (String)
 - `custom_subject` (String)
+- `selector` (String)
 - `template` (String, Deprecated)
 
 ## Import

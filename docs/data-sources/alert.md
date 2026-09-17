@@ -55,5 +55,6 @@ Read-Only:
 - `custom_body` (String)
 - `custom_subject` (String)
 - `op` (String)
+- `selector` (String)
 - `template` (String)
 - `value` (Number)

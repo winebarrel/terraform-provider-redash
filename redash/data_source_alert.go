@@ -38,6 +38,10 @@ func dataSourceAlert() *schema.Resource {
 							Type:     schema.TypeFloat,
 							Computed: true,
 						},
+						"selector": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
 						"custom_subject": {
 							Type:     schema.TypeString,
 							Computed: true,

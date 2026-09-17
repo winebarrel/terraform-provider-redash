@@ -24,6 +24,7 @@ func TestAccDataAlert_basic(t *testing.T) {
 						"column":         "?column?",
 						"op":             "<",
 						"value":          "1.5",
+						"selector":       "first",
 						"custom_subject": "subject",
 						"custom_body":    "body",
 						"template":       "",
