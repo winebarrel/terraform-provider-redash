@@ -145,7 +145,6 @@ func createAlert(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 	}
 
 	alert, err := client.CreateAlert(ctx, input)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -154,7 +153,6 @@ func createAlert(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 
 	if d.Get("muted").(bool) {
 		err = client.MuteAlert(ctx, alert.ID)
-
 		if err != nil {
 			return diag.FromErr(err)
 		}
@@ -165,7 +163,6 @@ func createAlert(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 
 func readAlert(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
 	err := readAlert0(ctx, d, meta)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -175,14 +172,12 @@ func readAlert(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagn
 
 func readAlert0(ctx context.Context, d *schema.ResourceData, meta any) error {
 	id, err := strconv.Atoi(d.Id())
-
 	if err != nil {
 		return err
 	}
 
 	client := meta.(*redashgo.Client)
 	alert, err := client.GetAlert(ctx, id)
-
 	if err != nil {
 		return err
 	}
@@ -231,7 +226,6 @@ func updateAlert(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 	}
 
 	_, err := client.UpdateAlert(ctx, id, input)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -256,7 +250,6 @@ func deleteAlert(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 	client := meta.(*redashgo.Client)
 
 	err := client.DeleteAlert(ctx, id)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -268,7 +261,6 @@ func deleteAlert(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 
 func importAlert(ctx context.Context, d *schema.ResourceData, meta any) ([]*schema.ResourceData, error) {
 	err := readAlert0(ctx, d, meta)
-
 	if err != nil {
 		return nil, err
 	}

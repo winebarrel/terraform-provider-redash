@@ -64,7 +64,6 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (any, diag.D
 	}
 
 	client, err := redash_go.NewClient(url, apiKey)
-
 	if err != nil {
 		return nil, diag.FromErr(err)
 	}

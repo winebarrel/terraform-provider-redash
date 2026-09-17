@@ -39,7 +39,6 @@ func createGroupUser(ctx context.Context, d *schema.ResourceData, meta any) diag
 	groupId := d.Get("group_id").(int)
 	userId := d.Get("user_id").(int)
 	member, err := client.AddGroupMember(ctx, groupId, userId)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -56,7 +55,6 @@ func deleteGroupUser(ctx context.Context, d *schema.ResourceData, meta any) diag
 	client := meta.(*redashgo.Client)
 
 	err := client.RemoveGroupMember(ctx, groupId, memberId)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -69,13 +67,11 @@ func deleteGroupUser(ctx context.Context, d *schema.ResourceData, meta any) diag
 func importGroupMember(ctx context.Context, d *schema.ResourceData, meta any) ([]*schema.ResourceData, error) {
 	groupMemberId := strings.SplitN(d.Id(), "/", 2)
 	groupId, err := strconv.Atoi(groupMemberId[0])
-
 	if err != nil {
 		return nil, err
 	}
 
 	memberId, err := strconv.Atoi(groupMemberId[1])
-
 	if err != nil {
 		return nil, err
 	}

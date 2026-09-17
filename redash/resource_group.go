@@ -35,7 +35,6 @@ func createGroup(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 	}
 
 	query, err := client.CreateGroup(ctx, input)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -50,7 +49,6 @@ func deleteGroup(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 	client := meta.(*redashgo.Client)
 
 	err := client.DeleteGroup(ctx, id)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -62,7 +60,6 @@ func deleteGroup(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 
 func importGroup(ctx context.Context, d *schema.ResourceData, meta any) ([]*schema.ResourceData, error) {
 	_, err := strconv.Atoi(d.Id())
-
 	if err != nil {
 		return nil, err
 	}

@@ -53,7 +53,6 @@ func createDataSource(ctx context.Context, d *schema.ResourceData, meta any) dia
 	if v, ok := d.GetOk("options"); ok {
 		options := map[string]any{}
 		err := json.Unmarshal([]byte(v.(string)), &options)
-
 		if err != nil {
 			return diag.FromErr(err)
 		}
@@ -62,7 +61,6 @@ func createDataSource(ctx context.Context, d *schema.ResourceData, meta any) dia
 	}
 
 	ds, err := client.CreateDataSource(ctx, input)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -74,7 +72,6 @@ func createDataSource(ctx context.Context, d *schema.ResourceData, meta any) dia
 
 func readDataSource(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
 	err := readDataSource0(ctx, d, meta)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -84,14 +81,12 @@ func readDataSource(ctx context.Context, d *schema.ResourceData, meta any) diag.
 
 func readDataSource0(ctx context.Context, d *schema.ResourceData, meta any) error {
 	id, err := strconv.Atoi(d.Id())
-
 	if err != nil {
 		return err
 	}
 
 	client := meta.(*redashgo.Client)
 	ds, err := client.GetDataSource(ctx, id)
-
 	if err != nil {
 		return err
 	}
@@ -118,7 +113,6 @@ func readDataSource0(ctx context.Context, d *schema.ResourceData, meta any) erro
 	}
 
 	options, err := json.Marshal(ds.Options)
-
 	if err != nil {
 		return err
 	}
@@ -140,7 +134,6 @@ func updateDataSource(ctx context.Context, d *schema.ResourceData, meta any) dia
 	if v, ok := d.GetOk("options"); ok {
 		options := map[string]any{}
 		err := json.Unmarshal([]byte(v.(string)), &options)
-
 		if err != nil {
 			return diag.FromErr(err)
 		}
@@ -149,7 +142,6 @@ func updateDataSource(ctx context.Context, d *schema.ResourceData, meta any) dia
 	}
 
 	_, err := client.UpdateDataSource(ctx, id, input)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -162,7 +154,6 @@ func deleteDataSource(ctx context.Context, d *schema.ResourceData, meta any) dia
 	client := meta.(*redashgo.Client)
 
 	err := client.DeleteDataSource(ctx, id)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -174,7 +165,6 @@ func deleteDataSource(ctx context.Context, d *schema.ResourceData, meta any) dia
 
 func importDataSource(ctx context.Context, d *schema.ResourceData, meta any) ([]*schema.ResourceData, error) {
 	err := readDataSource0(ctx, d, meta)
-
 	if err != nil {
 		return nil, err
 	}

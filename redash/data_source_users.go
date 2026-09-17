@@ -67,7 +67,6 @@ func readUsersByFilter(ctx context.Context, d *schema.ResourceData, meta any) di
 
 	for {
 		rs, err := client.ListUsers(ctx, input)
-
 		if err != nil {
 			return diag.FromErr(err)
 		}

@@ -50,7 +50,6 @@ func createAlertDestination(ctx context.Context, d *schema.ResourceData, meta an
 	if v, ok := d.GetOk("options"); ok {
 		options := map[string]any{}
 		err := json.Unmarshal([]byte(v.(string)), &options)
-
 		if err != nil {
 			return diag.FromErr(err)
 		}
@@ -59,7 +58,6 @@ func createAlertDestination(ctx context.Context, d *schema.ResourceData, meta an
 	}
 
 	dest, err := client.CreateDestination(ctx, input)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -71,7 +69,6 @@ func createAlertDestination(ctx context.Context, d *schema.ResourceData, meta an
 
 func readAlertDestination(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
 	err := readAlertDestination0(ctx, d, meta)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -81,14 +78,12 @@ func readAlertDestination(ctx context.Context, d *schema.ResourceData, meta any)
 
 func readAlertDestination0(ctx context.Context, d *schema.ResourceData, meta any) error {
 	id, err := strconv.Atoi(d.Id())
-
 	if err != nil {
 		return err
 	}
 
 	client := meta.(*redashgo.Client)
 	dest, err := client.GetDestination(ctx, id)
-
 	if err != nil {
 		return err
 	}
@@ -97,7 +92,6 @@ func readAlertDestination0(ctx context.Context, d *schema.ResourceData, meta any
 	d.Set("type", dest.Type) //nolint:errcheck
 
 	options, err := json.Marshal(dest.Options)
-
 	if err != nil {
 		return err
 	}
@@ -112,7 +106,6 @@ func deleteAlertDestination(ctx context.Context, d *schema.ResourceData, meta an
 	client := meta.(*redashgo.Client)
 
 	err := client.DeleteDestination(ctx, id)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -124,7 +117,6 @@ func deleteAlertDestination(ctx context.Context, d *schema.ResourceData, meta an
 
 func importAlertDestination(ctx context.Context, d *schema.ResourceData, meta any) ([]*schema.ResourceData, error) {
 	err := readAlertDestination0(ctx, d, meta)
-
 	if err != nil {
 		return nil, err
 	}

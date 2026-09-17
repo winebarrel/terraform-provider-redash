@@ -25,7 +25,6 @@ func readGroupByName(ctx context.Context, d *schema.ResourceData, meta any) diag
 	client := meta.(*redashgo.Client)
 	name := d.Get("name").(string)
 	groups, err := client.ListGroups(ctx)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}

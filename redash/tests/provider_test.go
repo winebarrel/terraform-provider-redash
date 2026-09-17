@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/winebarrel/terraform-provider-redash/redash"
 )
 
@@ -36,12 +37,13 @@ func testAccPreCheck(t *testing.T) {
 
 func TestProvider(t *testing.T) {
 	assert := assert.New(t)
+	require := require.New(t)
 
 	provider := redash.Provider()
 	err := provider.InternalValidate()
-	assert.NoError(err)
+	require.NoError(err)
 
-	raw := map[string]interface{}{
+	raw := map[string]any{
 		"url":     "https://example.com",
 		"api_key": "api_key",
 	}
@@ -52,12 +54,13 @@ func TestProvider(t *testing.T) {
 
 func TestProvider_withoutURL(t *testing.T) {
 	assert := assert.New(t)
+	require := require.New(t)
 
 	provider := redash.Provider()
 	err := provider.InternalValidate()
-	assert.NoError(err)
+	require.NoError(err)
 
-	raw := map[string]interface{}{
+	raw := map[string]any{
 		"api_key": "api_key",
 	}
 
@@ -68,12 +71,13 @@ func TestProvider_withoutURL(t *testing.T) {
 
 func TestProvider_withoutAPIKey(t *testing.T) {
 	assert := assert.New(t)
+	require := require.New(t)
 
 	provider := redash.Provider()
 	err := provider.InternalValidate()
-	assert.NoError(err)
+	require.NoError(err)
 
-	raw := map[string]interface{}{
+	raw := map[string]any{
 		"url": "https://example.com",
 	}
 

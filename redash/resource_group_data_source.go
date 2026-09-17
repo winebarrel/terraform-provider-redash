@@ -45,7 +45,6 @@ func createGroupDataSource(ctx context.Context, d *schema.ResourceData, meta any
 	groupId := d.Get("group_id").(int)
 	dsId := d.Get("data_source_id").(int)
 	gds, err := client.AddGroupDataSource(ctx, groupId, dsId)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -54,7 +53,6 @@ func createGroupDataSource(ctx context.Context, d *schema.ResourceData, meta any
 		_, err = client.UpdateGroupDataSource(ctx, groupId, gds.ID, &redashgo.UpdateGroupDataSourceInput{
 			ViewOnly: true,
 		})
-
 		if err != nil {
 			return diag.FromErr(err)
 		}
@@ -75,7 +73,6 @@ func updateGroupDataSource(ctx context.Context, d *schema.ResourceData, meta any
 		_, err := client.UpdateGroupDataSource(ctx, groupId, gdsId, &redashgo.UpdateGroupDataSourceInput{
 			ViewOnly: d.Get("view_only").(bool),
 		})
-
 		if err != nil {
 			return diag.FromErr(err)
 		}
@@ -91,7 +88,6 @@ func deleteGroupDataSource(ctx context.Context, d *schema.ResourceData, meta any
 	client := meta.(*redashgo.Client)
 
 	err := client.RemoveGroupDataSource(ctx, groupId, gdsId)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -104,13 +100,11 @@ func deleteGroupDataSource(ctx context.Context, d *schema.ResourceData, meta any
 func importGroupDataSource(ctx context.Context, d *schema.ResourceData, meta any) ([]*schema.ResourceData, error) {
 	groupGdsId := strings.SplitN(d.Id(), "/", 2)
 	groupId, err := strconv.Atoi(groupGdsId[0])
-
 	if err != nil {
 		return nil, err
 	}
 
 	gdsId, err := strconv.Atoi(groupGdsId[1])
-
 	if err != nil {
 		return nil, err
 	}

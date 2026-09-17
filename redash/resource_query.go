@@ -314,7 +314,6 @@ func createQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 	}
 
 	query, err := client.CreateQuery(ctx, input)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -324,7 +323,6 @@ func createQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 
 		if published {
 			err = client.PublishQuery(ctx, query.ID)
-
 			if err != nil {
 				return diag.FromErr(err)
 			}
@@ -338,7 +336,6 @@ func createQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 
 func readQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
 	err := readQuery0(ctx, d, meta)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -348,14 +345,12 @@ func readQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagn
 
 func readQuery0(ctx context.Context, d *schema.ResourceData, meta any) error {
 	id, err := strconv.Atoi(d.Id())
-
 	if err != nil {
 		return err
 	}
 
 	client := meta.(*redashgo.Client)
 	query, err := client.GetQuery(ctx, id)
-
 	if err != nil {
 		return err
 	}
@@ -470,7 +465,6 @@ func updateQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 	}
 
 	_, err := client.UpdateQuery(ctx, id, input)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -483,7 +477,6 @@ func deleteQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 	client := meta.(*redashgo.Client)
 
 	err := client.ArchiveQuery(ctx, id)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -495,7 +488,6 @@ func deleteQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 
 func importQuery(ctx context.Context, d *schema.ResourceData, meta any) ([]*schema.ResourceData, error) {
 	err := readQuery0(ctx, d, meta)
-
 	if err != nil {
 		return nil, err
 	}

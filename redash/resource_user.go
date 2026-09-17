@@ -40,7 +40,6 @@ func createUser(ctx context.Context, d *schema.ResourceData, meta any) diag.Diag
 	}
 
 	user, err := client.CreateUser(ctx, input)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -52,7 +51,6 @@ func createUser(ctx context.Context, d *schema.ResourceData, meta any) diag.Diag
 
 func readUser(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
 	err := readUser0(ctx, d, meta)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -62,14 +60,12 @@ func readUser(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagno
 
 func readUser0(ctx context.Context, d *schema.ResourceData, meta any) error {
 	id, err := strconv.Atoi(d.Id())
-
 	if err != nil {
 		return err
 	}
 
 	client := meta.(*redashgo.Client)
 	user, err := client.GetUser(ctx, id)
-
 	if err != nil {
 		return err
 	}
@@ -90,7 +86,6 @@ func updateUser(ctx context.Context, d *schema.ResourceData, meta any) diag.Diag
 	}
 
 	_, err := client.UpdateUser(ctx, id, input)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -103,7 +98,6 @@ func deleteUser(ctx context.Context, d *schema.ResourceData, meta any) diag.Diag
 	client := meta.(*redashgo.Client)
 
 	err := client.DeleteUser(ctx, id)
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -115,7 +109,6 @@ func deleteUser(ctx context.Context, d *schema.ResourceData, meta any) diag.Diag
 
 func importUser(ctx context.Context, d *schema.ResourceData, meta any) ([]*schema.ResourceData, error) {
 	err := readUser0(ctx, d, meta)
-
 	if err != nil {
 		return nil, err
 	}
