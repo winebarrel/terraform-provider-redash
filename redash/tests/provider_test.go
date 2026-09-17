@@ -1,7 +1,6 @@
 package test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -48,7 +47,7 @@ func TestProvider(t *testing.T) {
 		"api_key": "api_key",
 	}
 
-	diagnostics := provider.Configure(context.Background(), terraform.NewResourceConfigRaw(raw))
+	diagnostics := provider.Configure(t.Context(), terraform.NewResourceConfigRaw(raw))
 	assert.False(diagnostics.HasError())
 }
 
@@ -64,7 +63,7 @@ func TestProvider_withoutURL(t *testing.T) {
 		"api_key": "api_key",
 	}
 
-	diagnostics := provider.Configure(context.Background(), terraform.NewResourceConfigRaw(raw))
+	diagnostics := provider.Configure(t.Context(), terraform.NewResourceConfigRaw(raw))
 	assert.True(diagnostics.HasError())
 	assert.Equal("url is required", diagnostics[0].Summary)
 }
@@ -81,7 +80,7 @@ func TestProvider_withoutAPIKey(t *testing.T) {
 		"url": "https://example.com",
 	}
 
-	diagnostics := provider.Configure(context.Background(), terraform.NewResourceConfigRaw(raw))
+	diagnostics := provider.Configure(t.Context(), terraform.NewResourceConfigRaw(raw))
 	assert.True(diagnostics.HasError())
 	assert.Equal("api_key is required", diagnostics[0].Summary)
 }

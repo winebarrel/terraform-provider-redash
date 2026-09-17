@@ -50,9 +50,9 @@ func createAlertSubscription(ctx context.Context, d *schema.ResourceData, meta a
 }
 
 func deleteAlertSubscription(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
-	alertSubsId := strings.SplitN(d.Id(), "/", 2)
-	alertId, _ := strconv.Atoi(alertSubsId[0])
-	subsId, _ := strconv.Atoi(alertSubsId[1])
+	alertIdStr, subsIdStr, _ := strings.Cut(d.Id(), "/")
+	alertId, _ := strconv.Atoi(alertIdStr)
+	subsId, _ := strconv.Atoi(subsIdStr)
 	client := meta.(*redashgo.Client)
 
 	err := client.RemoveAlertSubscription(ctx, alertId, subsId)
@@ -66,13 +66,17 @@ func deleteAlertSubscription(ctx context.Context, d *schema.ResourceData, meta a
 }
 
 func importAlertSubscription(ctx context.Context, d *schema.ResourceData, meta any) ([]*schema.ResourceData, error) {
-	alertDestId := strings.SplitN(d.Id(), "/", 2)
-	alertId, err := strconv.Atoi(alertDestId[0])
+	alertIdStr, destIdStr, ok := strings.Cut(d.Id(), "/")
+	if !ok {
+		return nil, fmt.Errorf("invalid import ID: %q", d.Id())
+	}
+
+	alertId, err := strconv.Atoi(alertIdStr)
 	if err != nil {
 		return nil, err
 	}
 
-	destId, err := strconv.Atoi(alertDestId[1])
+	destId, err := strconv.Atoi(destIdStr)
 	if err != nil {
 		return nil, err
 	}
