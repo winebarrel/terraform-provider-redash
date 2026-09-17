@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"strconv"
-	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	redashgo "github.com/winebarrel/redash-go/v2"
 )
 
@@ -65,19 +65,7 @@ func resourceAlert() *schema.Resource {
 							Type:     schema.TypeString,
 							Required: true,
 							// cf. https://github.com/getredash/redash/blob/v10.1.0/redash/models/__init__.py#L923
-							ValidateFunc: func(val any, key string) (warns []string, errs []error) {
-								v := val.(string)
-
-								for _, op := range alertOperators {
-									if op == v {
-										return
-									}
-								}
-
-								errs = append(errs, fmt.Errorf("must be a valid operator (%s), got: %s", strings.Join(alertOperators, ","), v))
-
-								return
-							},
+							ValidateFunc: validation.StringInSlice(alertOperators, false),
 						},
 						"value": {
 							Type:     schema.TypeFloat,
@@ -88,20 +76,8 @@ func resourceAlert() *schema.Resource {
 							Optional: true,
 							// Redash raises KeyError while rendering custom_subject/custom_body if this key is absent.
 							// cf. https://github.com/getredash/redash/blob/v26.3.0/redash/models/__init__.py#L1074
-							Default: "first",
-							ValidateFunc: func(val any, key string) (warns []string, errs []error) {
-								v := val.(string)
-
-								for _, selector := range alertSelectors {
-									if selector == v {
-										return
-									}
-								}
-
-								errs = append(errs, fmt.Errorf("must be a valid selector (%s), got: %s", strings.Join(alertSelectors, ","), v))
-
-								return
-							},
+							Default:      "first",
+							ValidateFunc: validation.StringInSlice(alertSelectors, false),
 						},
 						"custom_subject": {
 							Type:     schema.TypeString,
