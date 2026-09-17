@@ -42,6 +42,8 @@ resource "redash_alert_destination" "my_dest" {
 
 Import is supported using the following syntax:
 
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
 terraform import resource_alert_destination.my_dest 111 # Alert Destination ID
 ```

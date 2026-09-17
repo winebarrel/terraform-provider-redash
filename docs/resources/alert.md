@@ -60,19 +60,21 @@ resource "redash_alert" "my_alert" {
 Required:
 
 - `column` (String)
-- `op` (String)
+- `op` (String) Valid values: `>`, `>=`, `<`, `<=`, `==`, `!=`, `greater than`, `less than`, `equals`.
 - `value` (Number)
 
 Optional:
 
 - `custom_body` (String)
 - `custom_subject` (String)
-- `selector` (String)
+- `selector` (String) Valid values: `first`, `min`, `max`.
 - `template` (String, Deprecated)
 
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 terraform import redash_alert.my_alert 111 # Alert ID
