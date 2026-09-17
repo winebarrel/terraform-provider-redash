@@ -64,9 +64,9 @@ func createGroupDataSource(ctx context.Context, d *schema.ResourceData, meta any
 }
 
 func updateGroupDataSource(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
-	groupGdsId := strings.SplitN(d.Id(), "/", 2)
-	groupId, _ := strconv.Atoi(groupGdsId[0])
-	gdsId, _ := strconv.Atoi(groupGdsId[1])
+	groupIdStr, gdsIdStr, _ := strings.Cut(d.Id(), "/")
+	groupId, _ := strconv.Atoi(groupIdStr)
+	gdsId, _ := strconv.Atoi(gdsIdStr)
 	client := meta.(*redashgo.Client)
 
 	if d.HasChange("view_only") {
@@ -82,9 +82,9 @@ func updateGroupDataSource(ctx context.Context, d *schema.ResourceData, meta any
 }
 
 func deleteGroupDataSource(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
-	groupGdsId := strings.SplitN(d.Id(), "/", 2)
-	groupId, _ := strconv.Atoi(groupGdsId[0])
-	gdsId, _ := strconv.Atoi(groupGdsId[1])
+	groupIdStr, gdsIdStr, _ := strings.Cut(d.Id(), "/")
+	groupId, _ := strconv.Atoi(groupIdStr)
+	gdsId, _ := strconv.Atoi(gdsIdStr)
 	client := meta.(*redashgo.Client)
 
 	err := client.RemoveGroupDataSource(ctx, groupId, gdsId)
@@ -98,13 +98,17 @@ func deleteGroupDataSource(ctx context.Context, d *schema.ResourceData, meta any
 }
 
 func importGroupDataSource(ctx context.Context, d *schema.ResourceData, meta any) ([]*schema.ResourceData, error) {
-	groupGdsId := strings.SplitN(d.Id(), "/", 2)
-	groupId, err := strconv.Atoi(groupGdsId[0])
+	groupIdStr, gdsIdStr, ok := strings.Cut(d.Id(), "/")
+	if !ok {
+		return nil, fmt.Errorf("invalid import ID: %q", d.Id())
+	}
+
+	groupId, err := strconv.Atoi(groupIdStr)
 	if err != nil {
 		return nil, err
 	}
 
-	gdsId, err := strconv.Atoi(groupGdsId[1])
+	gdsId, err := strconv.Atoi(gdsIdStr)
 	if err != nil {
 		return nil, err
 	}

@@ -49,9 +49,9 @@ func createGroupUser(ctx context.Context, d *schema.ResourceData, meta any) diag
 }
 
 func deleteGroupUser(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
-	groupMemberId := strings.SplitN(d.Id(), "/", 2)
-	groupId, _ := strconv.Atoi(groupMemberId[0])
-	memberId, _ := strconv.Atoi(groupMemberId[1])
+	groupIdStr, memberIdStr, _ := strings.Cut(d.Id(), "/")
+	groupId, _ := strconv.Atoi(groupIdStr)
+	memberId, _ := strconv.Atoi(memberIdStr)
 	client := meta.(*redashgo.Client)
 
 	err := client.RemoveGroupMember(ctx, groupId, memberId)
@@ -65,13 +65,17 @@ func deleteGroupUser(ctx context.Context, d *schema.ResourceData, meta any) diag
 }
 
 func importGroupMember(ctx context.Context, d *schema.ResourceData, meta any) ([]*schema.ResourceData, error) {
-	groupMemberId := strings.SplitN(d.Id(), "/", 2)
-	groupId, err := strconv.Atoi(groupMemberId[0])
+	groupIdStr, memberIdStr, ok := strings.Cut(d.Id(), "/")
+	if !ok {
+		return nil, fmt.Errorf("invalid import ID: %q", d.Id())
+	}
+
+	groupId, err := strconv.Atoi(groupIdStr)
 	if err != nil {
 		return nil, err
 	}
 
-	memberId, err := strconv.Atoi(groupMemberId[1])
+	memberId, err := strconv.Atoi(memberIdStr)
 	if err != nil {
 		return nil, err
 	}

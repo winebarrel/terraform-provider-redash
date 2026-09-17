@@ -138,8 +138,7 @@ func readQueryByName(ctx context.Context, d *schema.ResourceData, meta any) diag
 	var queryId *int
 
 	if rawId, ok := d.GetOk("query_id"); ok {
-		n := rawId.(int)
-		queryId = &n
+		queryId = new(rawId.(int))
 	}
 
 	name := d.Get("name").(string)
