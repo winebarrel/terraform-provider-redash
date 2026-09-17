@@ -1,3 +1,10 @@
+## [1.6.0] - 2026-09-17
+
+### Changed
+
+* Update redash-go to [v2.11.0](https://github.com/winebarrel/redash-go/blob/main/CHANGELOG.md#2110---2026-09-17).
+* Add `selector` to `redash_alert` options. [pull#179](https://github.com/winebarrel/terraform-provider-redash/pull/179)
+
 ## [1.5.0] - 2026-09-11
 
 ### Fixed
