@@ -200,8 +200,8 @@ github.com/vmihailenco/msgpack/v5 v5.4.1 h1:cQriyiUvjTwOHg8QZaPihLWeRAAVoCpE00IU
 github.com/vmihailenco/msgpack/v5 v5.4.1/go.mod h1:GaZTsDaehaPpQVyxrf5mtQlH+pc21PIudVV/E3rRQok=
 github.com/vmihailenco/tagparser/v2 v2.0.0 h1:y09buUbR+b5aycVFQs/g70pqKVZNBmxwAhO7/IwNM9g=
 github.com/vmihailenco/tagparser/v2 v2.0.0/go.mod h1:Wri+At7QHww0WTrCBeu4J6bNtoV6mEfg5OIWRZA9qds=
-github.com/winebarrel/redash-go/v2 v2.11.0 h1:6tZ2tO69gtkFvUMRwUJLnM5p+QuIPUQwwPGf+IpeGJE=
-github.com/winebarrel/redash-go/v2 v2.11.0/go.mod h1:GueWE6rAXAThN58d/Fy7NJoA9pH0D74U7DUsnQ2FgTU=
+github.com/winebarrel/redash-go/v2 v2.12.0 h1:7hZ7dx8KRV9zIyCMc73c8CHeOm/gkVfknIjl4YzxUhU=
+github.com/winebarrel/redash-go/v2 v2.12.0/go.mod h1:GueWE6rAXAThN58d/Fy7NJoA9pH0D74U7DUsnQ2FgTU=
 github.com/xanzy/ssh-agent v0.3.3 h1:+/15pJfg/RsTxqYcX6fHqOXZwwMP+2VyYWJeWM2qQFM=
 github.com/xanzy/ssh-agent v0.3.3/go.mod h1:6dzNDKs0J9rVPHPhaGCukekBHKqfl+L3KghI1Bc68Uw=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
