@@ -109,7 +109,6 @@ func httpHeaders(d *schema.ResourceData) map[string]string {
 // header is already on the request and is left in place.
 type headerTransport struct {
 	headers map[string]string
-	base    http.RoundTripper
 }
 
 func (t *headerTransport) RoundTrip(req *http.Request) (*http.Response, error) {
@@ -118,9 +117,5 @@ func (t *headerTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 		req.Header.Set(k, v)
 	}
 
-	base := t.base
-	if base == nil {
-		base = http.DefaultTransport
-	}
-	return base.RoundTrip(req)
+	return http.DefaultTransport.RoundTrip(req)
 }
