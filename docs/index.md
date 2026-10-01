@@ -25,3 +25,4 @@ provider "redash" {
 
 - `api_key` (String, Sensitive) Redash User API Key. This can also be set from the REDASH_API_KEY environment variable.
 - `url` (String) Redash API endpoint URL. This can also be set from the REDASH_URL environment variable.
+- `http_headers` (Map of String, Sensitive) Extra HTTP headers sent on every Redash API request.

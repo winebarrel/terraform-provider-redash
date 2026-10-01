@@ -2,6 +2,7 @@ package redash
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/logging"
@@ -24,6 +25,13 @@ func Provider() *schema.Provider {
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("REDASH_API_KEY", nil),
 				Sensitive:   true,
+			},
+			"http_headers": {
+				Description: "Extra HTTP headers sent on every Redash API request.",
+				Type:        schema.TypeMap,
+				Optional:    true,
+				Sensitive:   true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 		},
 		ConfigureContextFunc: providerConfigure,
@@ -63,7 +71,12 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (any, diag.D
 		return nil, diag.Errorf("api_key is required")
 	}
 
-	client, err := redash_go.NewClient(url, apiKey)
+	var httpClient *http.Client
+	if headers := httpHeaders(d); len(headers) > 0 {
+		httpClient = &http.Client{Transport: &headerTransport{headers: headers}}
+	}
+
+	client, err := redash_go.NewClientWithHTTPClient(url, apiKey, httpClient)
 	if err != nil {
 		return nil, diag.FromErr(err)
 	}
@@ -71,4 +84,43 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (any, diag.D
 	client.SetDebug(logging.IsDebugOrHigher())
 
 	return client, nil
+}
+
+// httpHeaders reads the optional http_headers provider argument.
+// The Terraform SDK stores map values as map[string]any.
+// An unset argument returns nil, and the Redash client then uses http.DefaultClient.
+func httpHeaders(d *schema.ResourceData) map[string]string {
+	raw, ok := d.GetOk("http_headers")
+	if !ok {
+		return nil
+	}
+
+	in := raw.(map[string]any)
+	out := make(map[string]string, len(in))
+	for k, v := range in {
+		out[k] = v.(string)
+	}
+	return out
+}
+
+// headerTransport sets configured headers on each request. RoundTrip must not
+// modify the incoming request, so it clones it first. The Redash client sets
+// Authorization before http.Client.Do, which then runs RoundTrip, so that
+// header is already on the request and is left in place.
+type headerTransport struct {
+	headers map[string]string
+	base    http.RoundTripper
+}
+
+func (t *headerTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	req = req.Clone(req.Context())
+	for k, v := range t.headers {
+		req.Header.Set(k, v)
+	}
+
+	base := t.base
+	if base == nil {
+		base = http.DefaultTransport
+	}
+	return base.RoundTrip(req)
 }
