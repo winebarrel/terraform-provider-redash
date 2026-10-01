@@ -3,13 +3,18 @@ package test
 import (
 	"fmt"
 	"regexp"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	redashgo "github.com/winebarrel/redash-go/v2"
 )
 
 func TestAccGroupMember_basic(t *testing.T) {
+	var id string
+
 	resource.Test(t, resource.TestCase{
 		ProviderFactories: testAccProviderFactories,
 		PreCheck:          func() { testAccPreCheck(t) },
@@ -21,7 +26,19 @@ func TestAccGroupMember_basic(t *testing.T) {
 				Config: testAccGroupMemberBasic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGroupMember("redash_group_member.my_member"),
+					testAccCaptureID("redash_group_member.my_member", &id),
 				),
+			},
+			{
+				ResourceName:      "redash_group_member.my_member",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			{
+				PreConfig:          testAccRemoveGroupMember(t, &id),
+				Config:             testAccGroupMemberBasic,
+				PlanOnly:           true,
+				ExpectNonEmptyPlan: true,
 			},
 		},
 	})
@@ -59,5 +76,19 @@ func testAccCheckGroupMember(resourceName string) resource.TestCheckFunc {
 		}
 
 		return nil
+	}
+}
+
+func testAccRemoveGroupMember(t *testing.T, id *string) func() {
+	return func() {
+		groupIdStr, memberIdStr, _ := strings.Cut(*id, "/")
+		groupId, _ := strconv.Atoi(groupIdStr)
+		memberId, _ := strconv.Atoi(memberIdStr)
+		client := testAccProvider.Meta().(*redashgo.Client)
+
+		err := client.RemoveGroupMember(t.Context(), groupId, memberId)
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
 }

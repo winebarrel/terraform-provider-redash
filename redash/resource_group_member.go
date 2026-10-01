@@ -14,7 +14,7 @@ import (
 func resourceGroupMember() *schema.Resource {
 	return &schema.Resource{
 		CreateContext: createGroupUser,
-		ReadContext:   schema.NoopContext,
+		ReadContext:   readGroupMember,
 		DeleteContext: deleteGroupUser,
 		Importer: &schema.ResourceImporter{
 			StateContext: importGroupMember,
@@ -44,6 +44,30 @@ func createGroupUser(ctx context.Context, d *schema.ResourceData, meta any) diag
 	}
 
 	d.SetId(fmt.Sprintf("%d/%d", groupId, member.ID))
+
+	return nil
+}
+
+func readGroupMember(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
+	groupIdStr, memberIdStr, _ := strings.Cut(d.Id(), "/")
+	groupId, _ := strconv.Atoi(groupIdStr)
+	memberId, _ := strconv.Atoi(memberIdStr)
+	client := meta.(*redashgo.Client)
+
+	members, err := client.ListGroupMembers(ctx, groupId)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	for _, m := range members {
+		if m.ID == memberId {
+			d.Set("group_id", groupId) //nolint:errcheck
+			d.Set("user_id", m.ID)     //nolint:errcheck
+			return nil
+		}
+	}
+
+	d.SetId("")
 
 	return nil
 }
