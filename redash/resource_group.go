@@ -13,6 +13,7 @@ func resourceGroup() *schema.Resource {
 	return &schema.Resource{
 		CreateContext: createGroup,
 		ReadContext:   readGroup,
+		UpdateContext: updateGroup,
 		DeleteContext: deleteGroup,
 		Importer: &schema.ResourceImporter{
 			StateContext: importGroup,
@@ -21,7 +22,6 @@ func resourceGroup() *schema.Resource {
 			"name": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 		},
 	}
@@ -57,6 +57,22 @@ func readGroup(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagn
 	}
 
 	d.Set("name", group.Name) //nolint:errcheck
+
+	return nil
+}
+
+func updateGroup(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
+	id, _ := strconv.Atoi(d.Id())
+	client := meta.(*redashgo.Client)
+
+	input := &redashgo.UpdateGroupInput{
+		Name: d.Get("name").(string),
+	}
+
+	_, err := client.UpdateGroup(ctx, id, input)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
 	return nil
 }
