@@ -3,13 +3,18 @@ package test
 import (
 	"fmt"
 	"regexp"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	redashgo "github.com/winebarrel/redash-go/v2"
 )
 
 func TestAccAlertSubscription_basic(t *testing.T) {
+	var id string
+
 	resource.Test(t, resource.TestCase{
 		ProviderFactories: testAccProviderFactories,
 		PreCheck:          func() { testAccPreCheck(t) },
@@ -19,7 +24,22 @@ func TestAccAlertSubscription_basic(t *testing.T) {
 			},
 			{
 				Config: testAccAlertSubscriptionConfigBasic,
-				Check:  testAccCheckAlertSubscription("redash_alert_subscription.my_subs"),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckAlertSubscription("redash_alert_subscription.my_subs"),
+					testAccCaptureID("redash_alert_subscription.my_subs", &id),
+				),
+			},
+			{
+				ResourceName:      "redash_alert_subscription.my_subs",
+				ImportState:       true,
+				ImportStateIdFunc: testAccAlertSubscriptionImportID("redash_alert_subscription.my_subs"),
+				ImportStateVerify: true,
+			},
+			{
+				PreConfig:          testAccRemoveAlertSubscription(t, &id),
+				Config:             testAccAlertSubscriptionConfigBasic,
+				PlanOnly:           true,
+				ExpectNonEmptyPlan: true,
 			},
 		},
 	})
@@ -65,5 +85,31 @@ func testAccCheckAlertSubscription(resourceName string) resource.TestCheckFunc {
 		}
 
 		return nil
+	}
+}
+
+func testAccAlertSubscriptionImportID(resourceName string) resource.ImportStateIdFunc {
+	return func(s *terraform.State) (string, error) {
+		rs, ok := s.RootModule().Resources[resourceName]
+
+		if !ok {
+			return "", fmt.Errorf("Not found: %s", resourceName)
+		}
+
+		return rs.Primary.Attributes["alert_id"] + "/" + rs.Primary.Attributes["alert_destination_id"], nil
+	}
+}
+
+func testAccRemoveAlertSubscription(t *testing.T, id *string) func() {
+	return func() {
+		alertIdStr, subsIdStr, _ := strings.Cut(*id, "/")
+		alertId, _ := strconv.Atoi(alertIdStr)
+		subsId, _ := strconv.Atoi(subsIdStr)
+		client := testAccProvider.Meta().(*redashgo.Client)
+
+		err := client.RemoveAlertSubscription(t.Context(), alertId, subsId)
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
 }

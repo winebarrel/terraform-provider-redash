@@ -14,7 +14,7 @@ import (
 func resourceAlertSubscription() *schema.Resource {
 	return &schema.Resource{
 		CreateContext: createAlertSubscription,
-		ReadContext:   schema.NoopContext,
+		ReadContext:   readAlertSubscription,
 		DeleteContext: deleteAlertSubscription,
 		Importer: &schema.ResourceImporter{
 			StateContext: importAlertSubscription,
@@ -45,6 +45,30 @@ func createAlertSubscription(ctx context.Context, d *schema.ResourceData, meta a
 	}
 
 	d.SetId(fmt.Sprintf("%d/%d", alertId, subs.ID))
+
+	return nil
+}
+
+func readAlertSubscription(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
+	alertIdStr, subsIdStr, _ := strings.Cut(d.Id(), "/")
+	alertId, _ := strconv.Atoi(alertIdStr)
+	subsId, _ := strconv.Atoi(subsIdStr)
+	client := meta.(*redashgo.Client)
+
+	subsList, err := client.ListAlertSubscriptions(ctx, alertId)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	for _, s := range subsList {
+		if s.ID == subsId {
+			d.Set("alert_id", s.AlertID)                    //nolint:errcheck
+			d.Set("alert_destination_id", s.Destination.ID) //nolint:errcheck
+			return nil
+		}
+	}
+
+	d.SetId("")
 
 	return nil
 }
