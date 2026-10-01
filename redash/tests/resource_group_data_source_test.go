@@ -31,6 +31,18 @@ func TestAccGroupDataSource_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("redash_group_data_source.my_gds", "view_only", "true"),
 				),
 			},
+			{
+				ResourceName:      "redash_group_data_source.my_gds",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			{
+				Config: testAccGroupSubscriptionConfigBasic,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGroupDataSource("redash_group_data_source.my_gds"),
+					resource.TestCheckResourceAttr("redash_group_data_source.my_gds", "view_only", "false"),
+				),
+			},
 		},
 	})
 }

@@ -14,7 +14,7 @@ import (
 func resourceGroupDataSource() *schema.Resource {
 	return &schema.Resource{
 		CreateContext: createGroupDataSource,
-		ReadContext:   schema.NoopContext,
+		ReadContext:   readGroupDataSource,
 		UpdateContext: updateGroupDataSource,
 		DeleteContext: deleteGroupDataSource,
 		Importer: &schema.ResourceImporter{
@@ -59,6 +59,31 @@ func createGroupDataSource(ctx context.Context, d *schema.ResourceData, meta any
 	}
 
 	d.SetId(fmt.Sprintf("%d/%d", groupId, gds.ID))
+
+	return nil
+}
+
+func readGroupDataSource(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
+	groupIdStr, gdsIdStr, _ := strings.Cut(d.Id(), "/")
+	groupId, _ := strconv.Atoi(groupIdStr)
+	gdsId, _ := strconv.Atoi(gdsIdStr)
+	client := meta.(*redashgo.Client)
+
+	dsList, err := client.ListGroupDataSources(ctx, groupId)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	for _, ds := range dsList {
+		if ds.ID == gdsId {
+			d.Set("group_id", groupId)      //nolint:errcheck
+			d.Set("data_source_id", ds.ID)  //nolint:errcheck
+			d.Set("view_only", ds.ViewOnly) //nolint:errcheck
+			return nil
+		}
+	}
+
+	d.SetId("")
 
 	return nil
 }
