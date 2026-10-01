@@ -73,7 +73,7 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (any, diag.D
 
 	var httpClient *http.Client
 	if headers := httpHeaders(d); len(headers) > 0 {
-		httpClient = &http.Client{Transport: &headerTransport{headers: headers}}
+		httpClient = &http.Client{Transport: headerTransport(headers)}
 	}
 
 	client, err := redash_go.NewClientWithHTTPClient(url, apiKey, httpClient)
@@ -107,20 +107,13 @@ func httpHeaders(d *schema.ResourceData) map[string]string {
 // modify the incoming request, so it clones it first. The Redash client sets
 // Authorization before http.Client.Do, which then runs RoundTrip, so that
 // header is already on the request and is left in place.
-type headerTransport struct {
-	headers map[string]string
-	base    http.RoundTripper
-}
+type headerTransport map[string]string
 
-func (t *headerTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+func (t headerTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	req = req.Clone(req.Context())
-	for k, v := range t.headers {
+	for k, v := range t {
 		req.Header.Set(k, v)
 	}
 
-	base := t.base
-	if base == nil {
-		base = http.DefaultTransport
-	}
-	return base.RoundTrip(req)
+	return http.DefaultTransport.RoundTrip(req)
 }
