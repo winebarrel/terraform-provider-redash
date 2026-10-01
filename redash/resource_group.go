@@ -12,7 +12,7 @@ import (
 func resourceGroup() *schema.Resource {
 	return &schema.Resource{
 		CreateContext: createGroup,
-		ReadContext:   schema.NoopContext,
+		ReadContext:   readGroup,
 		DeleteContext: deleteGroup,
 		Importer: &schema.ResourceImporter{
 			StateContext: importGroup,
@@ -40,6 +40,23 @@ func createGroup(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 	}
 
 	d.SetId(strconv.Itoa(query.ID))
+
+	return nil
+}
+
+func readGroup(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
+	id, err := strconv.Atoi(d.Id())
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	client := meta.(*redashgo.Client)
+	group, err := client.GetGroup(ctx, id)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	d.Set("name", group.Name) //nolint:errcheck
 
 	return nil
 }
