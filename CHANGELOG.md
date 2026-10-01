@@ -1,3 +1,9 @@
+## [1.8.0] - 2026-10-01
+
+### Changed
+
+* Add `http_headers` provider argument to send extra HTTP headers on Redash API requests. [pull#190](https://github.com/winebarrel/terraform-provider-redash/pull/190)
+
 ## [1.7.0] - 2026-09-17
 
 ### Changed
