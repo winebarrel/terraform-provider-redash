@@ -106,7 +106,8 @@ func httpHeaders(d *schema.ResourceData) map[string]string {
 // headerTransport sets configured headers on each request. RoundTrip must not
 // modify the incoming request, so it clones it first. The Redash client sets
 // Authorization before http.Client.Do, which then runs RoundTrip, so that
-// header is already on the request and is left in place.
+// header is already on the request and is left in place unless http_headers
+// also sets it.
 type headerTransport map[string]string
 
 func (t headerTransport) RoundTrip(req *http.Request) (*http.Response, error) {
