@@ -1,3 +1,10 @@
+## [1.9.0] - 2026-10-02
+
+### Fixed
+
+* Fix `redash_group` being replaced after import. [pull#196](https://github.com/winebarrel/terraform-provider-redash/pull/196)
+* Fix `view_only` not being set on `redash_group_data_source` import. [pull#197](https://github.com/winebarrel/terraform-provider-redash/pull/197)
+
 ## [1.8.0] - 2026-10-01
 
 ### Changed
