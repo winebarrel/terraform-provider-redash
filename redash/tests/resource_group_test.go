@@ -23,6 +23,11 @@ func TestAccGroup_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("redash_group.my_group", "name", "my-group2"),
 				),
 			},
+			{
+				ResourceName:      "redash_group.my_group",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
