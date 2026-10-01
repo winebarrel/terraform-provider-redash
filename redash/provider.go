@@ -87,7 +87,7 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (any, diag.D
 }
 
 // httpHeaders reads the optional http_headers provider argument.
-// The Terraform SDK stores map values as map[string]interface{}.
+// The Terraform SDK stores map values as map[string]any.
 // An unset argument returns nil, and the Redash client then uses http.DefaultClient.
 func httpHeaders(d *schema.ResourceData) map[string]string {
 	raw, ok := d.GetOk("http_headers")
@@ -95,7 +95,7 @@ func httpHeaders(d *schema.ResourceData) map[string]string {
 		return nil
 	}
 
-	in := raw.(map[string]interface{})
+	in := raw.(map[string]any)
 	out := make(map[string]string, len(in))
 	for k, v := range in {
 		out[k] = v.(string)
