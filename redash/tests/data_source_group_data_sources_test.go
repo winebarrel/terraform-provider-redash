@@ -30,5 +30,7 @@ func TestAccDataSourceGroupDataSources_basic(t *testing.T) {
 const testAccDataSourceGroupDataSourcesConfig = testAccGroupSubscriptionConfigBasic + `
 data "redash_group_data_sources" "my_group" {
   group_id = redash_group.my_group.id
+
+  depends_on = [redash_group_data_source.my_gds]
 }
 `
