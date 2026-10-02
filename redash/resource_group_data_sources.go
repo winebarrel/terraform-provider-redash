@@ -33,6 +33,9 @@ func resourceGroupDataSources() *schema.Resource {
 				Description: "Data sources granted to the group. Omit this to grant none.",
 				Type:        schema.TypeSet,
 				Optional:    true,
+				// Name is filled in from Redash after apply. Hashing it makes Terraform
+				// replace the block on the next plan when the config omits name.
+				Set: hashGroupDataSource,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"data_source_id": {
@@ -45,6 +48,10 @@ func resourceGroupDataSources() *schema.Resource {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Computed:    true,
+							// An omitted name is not a change. The stored name comes from Redash.
+							DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+								return new == ""
+							},
 						},
 						"view_only": {
 							Description: "When true, the group has view-only access. Defaults to false (full access).",
@@ -213,6 +220,11 @@ func configuredGroupDataSources(d interface{ Get(string) any }) (map[int]bool, e
 	}
 
 	return grants, nil
+}
+
+func hashGroupDataSource(v any) int {
+	m := v.(map[string]any)
+	return schema.HashString(fmt.Sprintf("%v-%v", m["data_source_id"], m["view_only"]))
 }
 
 func rejectDuplicateGroupDataSources(_ context.Context, d *schema.ResourceDiff, _ any) error {
