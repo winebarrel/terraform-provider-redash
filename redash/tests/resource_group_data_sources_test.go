@@ -2,6 +2,7 @@ package test
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"testing"
 
@@ -125,6 +126,68 @@ func TestAccGroupDataSources_createWithNewDataSources(t *testing.T) {
 			},
 		},
 	})
+}
+
+func TestAccGroupDataSources_createRemovesExisting(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		ProviderFactories: testAccProviderFactories,
+		PreCheck:          func() { testAccPreCheck(t) },
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGroupDataSourcesBase,
+				Check:  testAccAddExtraGroupDataSource,
+			},
+			{
+				Config: testAccGroupDataSourcesOne,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("redash_group_data_sources.my_group", "data_source.#", "1"),
+					resource.TestCheckTypeSetElemAttrPair(
+						"redash_group_data_sources.my_group", "data_source.*.data_source_id",
+						"redash_data_source.my_data_source", "id",
+					),
+				),
+			},
+		},
+	})
+}
+
+func TestAccGroupDataSources_destroyRemovesAll(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		ProviderFactories: testAccProviderFactories,
+		PreCheck:          func() { testAccPreCheck(t) },
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGroupDataSourcesOne,
+				Check:  testAccAddExtraGroupDataSource,
+				// The grant added in Check shows up as a diff.
+				ExpectNonEmptyPlan: true,
+			},
+			{
+				// Destroy only redash_group_data_sources.
+				Config: testAccGroupDataSourcesBase,
+				Check:  testAccCheckGroupHasNoDataSources,
+			},
+		},
+	})
+}
+
+func testAccCheckGroupHasNoDataSources(s *terraform.State) error {
+	groupId, err := strconv.Atoi(s.RootModule().Resources["redash_group.my_group"].Primary.ID)
+	if err != nil {
+		return err
+	}
+
+	client := testAccProvider.Meta().(*redashgo.Client)
+	dsList, err := client.ListGroupDataSources(context.Background(), groupId)
+	if err != nil {
+		return err
+	}
+
+	if len(dsList) != 0 {
+		return fmt.Errorf("group %d still has %d data sources", groupId, len(dsList))
+	}
+
+	return nil
 }
 
 func testAccAddExtraGroupDataSource(s *terraform.State) error {
