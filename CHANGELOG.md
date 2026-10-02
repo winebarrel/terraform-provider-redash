@@ -1,3 +1,9 @@
+## [1.10.0] - 2026-10-02
+
+### Added
+
+* Add `redash_group_data_sources` data source to list the data sources granted to a group. [pull#202](https://github.com/winebarrel/terraform-provider-redash/pull/202)
+
 ## [1.9.0] - 2026-10-02
 
 ### Changed
