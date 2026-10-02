@@ -23,14 +23,25 @@ func TestAccDataSourceGroupDataSources_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.redash_group_data_sources.my_group", "data_sources.0.view_only", "false"),
 				),
 			},
+			{
+				Config: testAccDataSourceGroupDataSourcesConfigViewOnly,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("data.redash_group_data_sources.my_group", "data_sources.#", "1"),
+					resource.TestCheckResourceAttr("data.redash_group_data_sources.my_group", "data_sources.0.view_only", "true"),
+				),
+			},
 		},
 	})
 }
 
-const testAccDataSourceGroupDataSourcesConfig = testAccGroupSubscriptionConfigBasic + `
+const testAccDataSourceGroupDataSourcesData = `
 data "redash_group_data_sources" "my_group" {
   group_id = redash_group.my_group.id
 
   depends_on = [redash_group_data_source.my_gds]
 }
 `
+
+const testAccDataSourceGroupDataSourcesConfig = testAccGroupSubscriptionConfigBasic + testAccDataSourceGroupDataSourcesData
+
+const testAccDataSourceGroupDataSourcesConfigViewOnly = testAccGroupSubscriptionConfigViewOnly + testAccDataSourceGroupDataSourcesData
