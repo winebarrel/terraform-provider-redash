@@ -47,13 +47,14 @@ func Provider() *schema.Provider {
 			"redash_user":               resourceUser(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
-			"redash_alert_destination": dataSourceAlertDestination(),
-			"redash_alert":             dataSourceAlert(),
-			"redash_data_source":       dataSourceDataSource(),
-			"redash_group":             dataSourceGroup(),
-			"redash_query":             dataSourceQuery(),
-			"redash_user":              dataSourceUser(),
-			"redash_users":             dataSourceUsers(),
+			"redash_alert_destination":  dataSourceAlertDestination(),
+			"redash_alert":              dataSourceAlert(),
+			"redash_data_source":        dataSourceDataSource(),
+			"redash_group_data_sources": dataSourceGroupDataSources(),
+			"redash_group":              dataSourceGroup(),
+			"redash_query":              dataSourceQuery(),
+			"redash_user":               dataSourceUser(),
+			"redash_users":              dataSourceUsers(),
 		},
 	}
 }
