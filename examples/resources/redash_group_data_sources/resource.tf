@@ -35,7 +35,6 @@ resource "redash_group_data_sources" "my_group" {
 
     content {
       data_source_id = data_source.value.id
-      name           = data_source.value.name
     }
   }
 }

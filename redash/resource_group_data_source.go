@@ -13,6 +13,7 @@ import (
 
 func resourceGroupDataSource() *schema.Resource {
 	return &schema.Resource{
+		Description:   "!> **Warning:** Do not use this resource together with `redash_group_data_sources` for the same group. Both manage the same grants and will conflict.",
 		CreateContext: createGroupDataSource,
 		ReadContext:   readGroupDataSource,
 		UpdateContext: updateGroupDataSource,

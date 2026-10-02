@@ -4,14 +4,26 @@ page_title: "redash_group_data_sources Resource - redash"
 subcategory: ""
 description: |-
   Authoritative for a given group. Updates the data sources granted to that group to match this list. Data sources not listed here are removed.
+  !> Warning: When this resource is created, data sources already granted to the group but not listed in data_source blocks are removed.
+  !> Warning: When this resource is destroyed, all data sources granted to the group are removed, including ones not listed in data_source blocks.
   !> Warning: Do not use this resource together with redash_group_data_source for the same group. Both manage the same grants and will conflict.
+  ~> Note: Redash adds every new data source to the default group. If this resource manages the default group, a new data source not listed here shows up as a diff and is removed on the next apply.
+  -> Note: Data sources are specified by ID. To specify one by name, look up its ID with the redash_data_source data source.
 ---
 
 # redash_group_data_sources (Resource)
 
 Authoritative for a given group. Updates the data sources granted to that group to match this list. Data sources not listed here are removed.
 
+!> **Warning:** When this resource is created, data sources already granted to the group but not listed in `data_source` blocks are removed.
+
+!> **Warning:** When this resource is destroyed, all data sources granted to the group are removed, including ones not listed in `data_source` blocks.
+
 !> **Warning:** Do not use this resource together with `redash_group_data_source` for the same group. Both manage the same grants and will conflict.
+
+~> **Note:** Redash adds every new data source to the `default` group. If this resource manages the `default` group, a new data source not listed here shows up as a diff and is removed on the next apply.
+
+-> **Note:** Data sources are specified by ID. To specify one by name, look up its ID with the `redash_data_source` data source.
 
 ## Example Usage
 
@@ -53,7 +65,6 @@ resource "redash_group_data_sources" "my_group" {
 
     content {
       data_source_id = data_source.value.id
-      name           = data_source.value.name
     }
   }
 }
@@ -83,7 +94,6 @@ Required:
 
 Optional:
 
-- `name` (String) Name of the data source. Set this to show the name in the plan. After apply, the name returned by Redash is stored.
 - `view_only` (Boolean) When true, the group has view-only access. Defaults to false (full access).
 
 ## Import

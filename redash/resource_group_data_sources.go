@@ -13,7 +13,11 @@ import (
 func resourceGroupDataSources() *schema.Resource {
 	return &schema.Resource{
 		Description: "Authoritative for a given group. Updates the data sources granted to that group to match this list. Data sources not listed here are removed.\n\n" +
-			"!> **Warning:** Do not use this resource together with `redash_group_data_source` for the same group. Both manage the same grants and will conflict.",
+			"!> **Warning:** When this resource is created, data sources already granted to the group but not listed in `data_source` blocks are removed.\n\n" +
+			"!> **Warning:** When this resource is destroyed, all data sources granted to the group are removed, including ones not listed in `data_source` blocks.\n\n" +
+			"!> **Warning:** Do not use this resource together with `redash_group_data_source` for the same group. Both manage the same grants and will conflict.\n\n" +
+			"~> **Note:** Redash adds every new data source to the `default` group. If this resource manages the `default` group, a new data source not listed here shows up as a diff and is removed on the next apply.\n\n" +
+			"-> **Note:** Data sources are specified by ID. To specify one by name, look up its ID with the `redash_data_source` data source.",
 		CreateContext: createGroupDataSources,
 		ReadContext:   readGroupDataSourcesSet,
 		UpdateContext: updateGroupDataSources,
@@ -33,25 +37,12 @@ func resourceGroupDataSources() *schema.Resource {
 				Description: "Data sources granted to the group. Omit this to grant none.",
 				Type:        schema.TypeSet,
 				Optional:    true,
-				// Name is filled in from Redash after apply. Hashing it makes Terraform
-				// replace the block on the next plan when the config omits name.
-				Set: hashGroupDataSource,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"data_source_id": {
 							Description: "ID of the data source.",
 							Type:        schema.TypeInt,
 							Required:    true,
-						},
-						"name": {
-							Description: "Name of the data source. Set this to show the name in the plan. After apply, the name returned by Redash is stored.",
-							Type:        schema.TypeString,
-							Optional:    true,
-							Computed:    true,
-							// An omitted name is not a change. The stored name comes from Redash.
-							DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-								return new == ""
-							},
 						},
 						"view_only": {
 							Description: "When true, the group has view-only access. Defaults to false (full access).",
@@ -93,7 +84,6 @@ func readGroupDataSourcesSet(ctx context.Context, d *schema.ResourceData, meta a
 	for _, ds := range dsList {
 		dataSources = append(dataSources, map[string]any{
 			"data_source_id": ds.ID,
-			"name":           ds.Name,
 			"view_only":      ds.ViewOnly,
 		})
 	}
@@ -220,11 +210,6 @@ func configuredGroupDataSources(d interface{ Get(string) any }) (map[int]bool, e
 	}
 
 	return grants, nil
-}
-
-func hashGroupDataSource(v any) int {
-	m := v.(map[string]any)
-	return schema.HashString(fmt.Sprintf("%v-%v", m["data_source_id"], m["view_only"]))
 }
 
 func rejectDuplicateGroupDataSources(_ context.Context, d *schema.ResourceDiff, _ any) error {
