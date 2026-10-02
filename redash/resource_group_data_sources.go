@@ -44,6 +44,11 @@ func resourceGroupDataSources() *schema.Resource {
 							Type:        schema.TypeInt,
 							Required:    true,
 						},
+						"name": {
+							Description: "Name of the data source.",
+							Type:        schema.TypeString,
+							Computed:    true,
+						},
 						"view_only": {
 							Description: "When true, the group has view-only access. Defaults to false (full access).",
 							Type:        schema.TypeBool,
@@ -84,6 +89,7 @@ func readGroupDataSourcesSet(ctx context.Context, d *schema.ResourceData, meta a
 	for _, ds := range dsList {
 		dataSources = append(dataSources, map[string]any{
 			"data_source_id": ds.ID,
+			"name":           ds.Name,
 			"view_only":      ds.ViewOnly,
 		})
 	}

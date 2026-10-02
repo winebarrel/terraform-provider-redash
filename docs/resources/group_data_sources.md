@@ -96,6 +96,10 @@ Optional:
 
 - `view_only` (Boolean) When true, the group has view-only access. Defaults to false (full access).
 
+Read-Only:
+
+- `name` (String) Name of the data source.
+
 ## Import
 
 Import is supported using the following syntax:
