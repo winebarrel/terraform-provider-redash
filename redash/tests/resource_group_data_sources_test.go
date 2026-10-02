@@ -25,6 +25,7 @@ func TestAccGroupDataSources_basic(t *testing.T) {
 						"redash_data_source.my_data_source", "id",
 					),
 					resource.TestCheckTypeSetElemNestedAttrs("redash_group_data_sources.my_group", "data_source.*", map[string]string{
+						"name":      "my-data-source",
 						"view_only": "false",
 					}),
 				),
