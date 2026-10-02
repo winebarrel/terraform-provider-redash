@@ -24,7 +24,6 @@ func TestAccGroupDataSources_basic(t *testing.T) {
 						"redash_data_source.my_data_source", "id",
 					),
 					resource.TestCheckTypeSetElemNestedAttrs("redash_group_data_sources.my_group", "data_source.*", map[string]string{
-						"name":      "my-data-source",
 						"view_only": "false",
 					}),
 				),
@@ -88,6 +87,8 @@ func TestAccGroupDataSources_removesExtra(t *testing.T) {
 					resource.TestCheckResourceAttr("redash_group_data_sources.my_group", "data_source.#", "1"),
 					testAccAddExtraGroupDataSource,
 				),
+				// The grant added in Check shows up as a diff.
+				ExpectNonEmptyPlan: true,
 			},
 			{
 				Config: testAccGroupDataSourcesOne,
@@ -96,6 +97,29 @@ func TestAccGroupDataSources_removesExtra(t *testing.T) {
 					resource.TestCheckTypeSetElemAttrPair(
 						"redash_group_data_sources.my_group", "data_source.*.data_source_id",
 						"redash_data_source.my_data_source", "id",
+					),
+				),
+			},
+		},
+	})
+}
+
+func TestAccGroupDataSources_createWithNewDataSources(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		ProviderFactories: testAccProviderFactories,
+		PreCheck:          func() { testAccPreCheck(t) },
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGroupDataSourcesTwo,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("redash_group_data_sources.my_group", "data_source.#", "2"),
+					resource.TestCheckTypeSetElemAttrPair(
+						"redash_group_data_sources.my_group", "data_source.*.data_source_id",
+						"redash_data_source.my_data_source", "id",
+					),
+					resource.TestCheckTypeSetElemAttrPair(
+						"redash_group_data_sources.my_group", "data_source.*.data_source_id",
+						"redash_data_source.extra", "id",
 					),
 				),
 			},

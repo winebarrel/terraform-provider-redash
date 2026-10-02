@@ -3,12 +3,12 @@
 page_title: "redash_group_data_source Resource - redash"
 subcategory: ""
 description: |-
-  
+  !> Warning: Do not use this resource together with redash_group_data_sources for the same group. Both manage the same grants and will conflict.
 ---
 
 # redash_group_data_source (Resource)
 
-
+!> **Warning:** Do not use this resource together with `redash_group_data_sources` for the same group. Both manage the same grants and will conflict.
 
 ## Example Usage
 
