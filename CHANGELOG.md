@@ -2,7 +2,7 @@
 
 ### Added
 
-* Add `redash_group_data_sources` resource to manage all the data sources granted to a group. [pull#205](https://github.com/winebarrel/terraform-provider-redash/pull/205) [pull#206](https://github.com/winebarrel/terraform-provider-redash/pull/206)
+* Add `redash_group_data_sources` resource to manage all the data sources granted to a group. [pull#205](https://github.com/winebarrel/terraform-provider-redash/pull/205) [pull#206](https://github.com/winebarrel/terraform-provider-redash/pull/206) [pull#209](https://github.com/winebarrel/terraform-provider-redash/pull/209)
 
 ## [1.10.0] - 2026-10-02
 
