@@ -3,9 +3,9 @@ package redash
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"strconv"
 
+	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	redashgo "github.com/winebarrel/redash-go/v2"
@@ -68,9 +68,9 @@ func createDataSource(ctx context.Context, d *schema.ResourceData, meta any) dia
 		Type: d.Get("type").(string),
 	}
 
-	options, ok, err := dataSourceOptions(d)
-	if err != nil {
-		return diag.FromErr(err)
+	options, ok, diags := dataSourceOptions(d)
+	if diags.HasError() {
+		return diags
 	}
 	if ok {
 		input.Options = options
@@ -159,15 +159,15 @@ func updateDataSource(ctx context.Context, d *schema.ResourceData, meta any) dia
 	// type changed. The client serializes a nil options map as null, which
 	// would clear credentials. options_wo itself never shows a plan diff;
 	// options_wo_version is the stored trigger for applying a new value.
-	options, ok, err := dataSourceOptions(d)
-	if err != nil {
-		return diag.FromErr(err)
+	options, ok, diags := dataSourceOptions(d)
+	if diags.HasError() {
+		return diags
 	}
 	if ok {
 		input.Options = options
 	}
 
-	_, err = client.UpdateDataSource(ctx, id, input)
+	_, err := client.UpdateDataSource(ctx, id, input)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -202,10 +202,10 @@ func importDataSource(ctx context.Context, d *schema.ResourceData, meta any) ([]
 // dataSourceOptions returns options from options_wo when it is set, otherwise
 // from options. options_wo is read from the raw config because d.Get does not
 // return write-only values.
-func dataSourceOptions(d *schema.ResourceData) (map[string]any, bool, error) {
-	options, ok, err := dataSourceOptionsWriteOnly(d)
-	if err != nil || ok {
-		return options, ok, err
+func dataSourceOptions(d *schema.ResourceData) (map[string]any, bool, diag.Diagnostics) {
+	options, ok, diags := dataSourceOptionsWriteOnly(d)
+	if diags.HasError() || ok {
+		return options, ok, diags
 	}
 
 	v, ok := d.GetOk("options")
@@ -213,31 +213,29 @@ func dataSourceOptions(d *schema.ResourceData) (map[string]any, bool, error) {
 		return nil, false, nil
 	}
 
-	options, err = unmarshalOptions(v.(string))
+	options, err := unmarshalOptions(v.(string))
 	if err != nil {
-		return nil, false, err
+		return nil, false, diag.FromErr(err)
 	}
 
 	return options, true, nil
 }
 
-func dataSourceOptionsWriteOnly(d *schema.ResourceData) (map[string]any, bool, error) {
-	raw := d.GetRawConfig()
-	if raw.IsNull() || !raw.IsKnown() || !raw.Type().IsObjectType() || !raw.Type().HasAttribute("options_wo") {
-		return nil, false, nil
+func dataSourceOptionsWriteOnly(d *schema.ResourceData) (map[string]any, bool, diag.Diagnostics) {
+	v, diags := d.GetRawConfigAt(cty.GetAttrPath("options_wo"))
+	if diags.HasError() {
+		return nil, false, diags
 	}
-
-	v := raw.GetAttr("options_wo")
 	if v.IsNull() {
 		return nil, false, nil
 	}
 	if !v.IsKnown() {
-		return nil, false, errors.New("options_wo is unknown")
+		return nil, false, diag.Errorf("options_wo is unknown")
 	}
 
 	options, err := unmarshalOptions(v.AsString())
 	if err != nil {
-		return nil, false, err
+		return nil, false, diag.FromErr(err)
 	}
 
 	return options, true, nil
