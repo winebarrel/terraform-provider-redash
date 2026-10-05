@@ -40,7 +40,14 @@ func readDataSourceByName(ctx context.Context, d *schema.ResourceData, meta any)
 	for _, ds := range dsList {
 		if ds.Name == name {
 			d.SetId(strconv.Itoa(ds.ID))
-			return readDataSource(ctx, d, meta)
+			// Always store options here. The resource read skips that when
+			// options is unset, so options_wo credentials stay out of state.
+			err := readDataSource0(ctx, d, meta, true)
+			if err != nil {
+				return diag.FromErr(err)
+			}
+
+			return nil
 		}
 	}
 

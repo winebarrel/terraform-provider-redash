@@ -3,6 +3,7 @@ package redash
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -34,9 +35,26 @@ func resourceDataSource() *schema.Resource {
 				Required: true,
 			},
 			"options": {
-				Description: "Data Source options (JSON string). Use `jsonencode()`.",
-				Type:        schema.TypeString,
-				Optional:    true,
+				Description:   "Data Source options (JSON string). Use `jsonencode()`. Stored in Terraform state. Conflicts with `options_wo` and `options_wo_version`.",
+				Type:          schema.TypeString,
+				Optional:      true,
+				ConflictsWith: []string{"options_wo", "options_wo_version"},
+			},
+			"options_wo": {
+				Description:   "Data Source options (JSON string) that are not stored in Terraform state. Use `jsonencode()`. Use this instead of `options` when the JSON contains credentials. Requires Terraform 1.11 or later. Conflicts with `options`. Pair with `options_wo_version`. Changing this value alone does not update the data source; increment `options_wo_version` to apply it. Redash does not return these values, so they are not refreshed into state.",
+				Type:          schema.TypeString,
+				Optional:      true,
+				WriteOnly:     true,
+				Sensitive:     true,
+				RequiredWith:  []string{"options_wo_version"},
+				ConflictsWith: []string{"options"},
+			},
+			"options_wo_version": {
+				Description:   "Version of `options_wo`, stored in Terraform state. Increment this when `options_wo` should be applied. Required with `options_wo`. Conflicts with `options`.",
+				Type:          schema.TypeInt,
+				Optional:      true,
+				RequiredWith:  []string{"options_wo"},
+				ConflictsWith: []string{"options"},
 			},
 		},
 	}
@@ -50,13 +68,11 @@ func createDataSource(ctx context.Context, d *schema.ResourceData, meta any) dia
 		Type: d.Get("type").(string),
 	}
 
-	if v, ok := d.GetOk("options"); ok {
-		options := map[string]any{}
-		err := json.Unmarshal([]byte(v.(string)), &options)
-		if err != nil {
-			return diag.FromErr(err)
-		}
-
+	options, ok, err := dataSourceOptions(d)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	if ok {
 		input.Options = options
 	}
 
@@ -71,7 +87,11 @@ func createDataSource(ctx context.Context, d *schema.ResourceData, meta any) dia
 }
 
 func readDataSource(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
-	err := readDataSource0(ctx, d, meta)
+	// Refresh does not include write-only values. When options is unset, leave
+	// it unset so options_wo is not copied from the API into state.
+	_, storeOptions := d.GetOk("options")
+
+	err := readDataSource0(ctx, d, meta, storeOptions)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -79,7 +99,7 @@ func readDataSource(ctx context.Context, d *schema.ResourceData, meta any) diag.
 	return nil
 }
 
-func readDataSource0(ctx context.Context, d *schema.ResourceData, meta any) error {
+func readDataSource0(ctx context.Context, d *schema.ResourceData, meta any, storeOptions bool) error {
 	id, err := strconv.Atoi(d.Id())
 	if err != nil {
 		return err
@@ -93,6 +113,10 @@ func readDataSource0(ctx context.Context, d *schema.ResourceData, meta any) erro
 
 	d.Set("name", ds.Name) //nolint:errcheck
 	d.Set("type", ds.Type) //nolint:errcheck
+
+	if !storeOptions {
+		return nil
+	}
 
 	// The API masks secret values with a placeholder. Writing the placeholder
 	// to the state would cause permanent drift against the configuration, so
@@ -131,17 +155,19 @@ func updateDataSource(ctx context.Context, d *schema.ResourceData, meta any) dia
 		Type: d.Get("type").(string),
 	}
 
-	if v, ok := d.GetOk("options"); ok {
-		options := map[string]any{}
-		err := json.Unmarshal([]byte(v.(string)), &options)
-		if err != nil {
-			return diag.FromErr(err)
-		}
-
+	// Send options_wo whenever it is configured, including when only name or
+	// type changed. The client serializes a nil options map as null, which
+	// would clear credentials. options_wo itself never shows a plan diff;
+	// options_wo_version is the stored trigger for applying a new value.
+	options, ok, err := dataSourceOptions(d)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	if ok {
 		input.Options = options
 	}
 
-	_, err := client.UpdateDataSource(ctx, id, input)
+	_, err = client.UpdateDataSource(ctx, id, input)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -164,10 +190,64 @@ func deleteDataSource(ctx context.Context, d *schema.ResourceData, meta any) dia
 }
 
 func importDataSource(ctx context.Context, d *schema.ResourceData, meta any) ([]*schema.ResourceData, error) {
-	err := readDataSource0(ctx, d, meta)
+	// Import records the API options, including masked secrets.
+	err := readDataSource0(ctx, d, meta, true)
 	if err != nil {
 		return nil, err
 	}
 
 	return []*schema.ResourceData{d}, nil
+}
+
+// dataSourceOptions returns options from options_wo when it is set, otherwise
+// from options. options_wo is read from the raw config because d.Get does not
+// return write-only values.
+func dataSourceOptions(d *schema.ResourceData) (map[string]any, bool, error) {
+	options, ok, err := dataSourceOptionsWriteOnly(d)
+	if err != nil || ok {
+		return options, ok, err
+	}
+
+	v, ok := d.GetOk("options")
+	if !ok {
+		return nil, false, nil
+	}
+
+	options, err = unmarshalOptions(v.(string))
+	if err != nil {
+		return nil, false, err
+	}
+
+	return options, true, nil
+}
+
+func dataSourceOptionsWriteOnly(d *schema.ResourceData) (map[string]any, bool, error) {
+	raw := d.GetRawConfig()
+	if raw.IsNull() || !raw.IsKnown() || !raw.Type().IsObjectType() || !raw.Type().HasAttribute("options_wo") {
+		return nil, false, nil
+	}
+
+	v := raw.GetAttr("options_wo")
+	if v.IsNull() {
+		return nil, false, nil
+	}
+	if !v.IsKnown() {
+		return nil, false, errors.New("options_wo is unknown")
+	}
+
+	options, err := unmarshalOptions(v.AsString())
+	if err != nil {
+		return nil, false, err
+	}
+
+	return options, true, nil
+}
+
+func unmarshalOptions(s string) (map[string]any, error) {
+	options := map[string]any{}
+	if err := json.Unmarshal([]byte(s), &options); err != nil {
+		return nil, err
+	}
+
+	return options, nil
 }
