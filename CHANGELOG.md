@@ -1,3 +1,9 @@
+## [1.12.0] - 2026-10-05
+
+### Added
+
+* Add write-only `options_wo` and `options_wo_version` arguments to `redash_data_source` so that data source options (e.g. credentials) are not stored in the Terraform state. Requires Terraform 1.11 or later. [pull#210](https://github.com/winebarrel/terraform-provider-redash/pull/210) [pull#211](https://github.com/winebarrel/terraform-provider-redash/pull/211) [pull#212](https://github.com/winebarrel/terraform-provider-redash/pull/212)
+
 ## [1.11.0] - 2026-10-03
 
 ### Added
