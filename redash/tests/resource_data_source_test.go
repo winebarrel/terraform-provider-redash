@@ -275,3 +275,130 @@ resource "redash_data_source" "my_data_source_with_secret" {
   })
 }
 `
+
+func TestAccDataSource_optionsWriteOnlyRename(t *testing.T) {
+	const addr = "redash_data_source.my_data_source_write_only_rename"
+
+	resource.Test(t, resource.TestCase{
+		ProviderFactories: testAccProviderFactories,
+		PreCheck:          func() { testAccPreCheck(t) },
+		Steps: []resource.TestStep{
+			{
+				Config: testAccDataSourceConfigWriteOnlyRename("my-data-source-write-only-rename"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(addr, "name", "my-data-source-write-only-rename"),
+					testAccCheckOptionsNotInState(addr, "supersecret"),
+				),
+			},
+			{
+				// Changing only the name must keep the options in Redash.
+				Config: testAccDataSourceConfigWriteOnlyRename("my-data-source-write-only-rename2"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(addr, "name", "my-data-source-write-only-rename2"),
+					resource.TestCheckResourceAttr(addr, "options_wo_version", "1"),
+					testAccCheckOptionsNotInState(addr, "supersecret"),
+					testAccCheckAPIDataSource(addr, map[string]string{
+						"dbname":   "postgres",
+						"host":     "postgres",
+						"user":     "postgres",
+						"password": "--------",
+					}),
+				),
+			},
+		},
+	})
+}
+
+func TestAccDataSource_optionsToWriteOnly(t *testing.T) {
+	const addr = "redash_data_source.my_data_source_migrate"
+
+	resource.Test(t, resource.TestCase{
+		ProviderFactories: testAccProviderFactories,
+		PreCheck:          func() { testAccPreCheck(t) },
+		Steps: []resource.TestStep{
+			{
+				Config: testAccDataSourceConfigMigrateOptions("supersecret"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(addr, "options", `{"dbname":"postgres","host":"postgres","password":"supersecret","port":5432,"user":"postgres"}`),
+				),
+			},
+			{
+				// Switching from options to options_wo removes options from the state.
+				Config: testAccDataSourceConfigMigrateWriteOnly,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(addr, "options_wo_version", "1"),
+					testAccCheckOptionsNotInState(addr, "supersecret", "supersecret2"),
+					testAccCheckAPIDataSource(addr, map[string]string{
+						"dbname":   "postgres2",
+						"host":     "postgres",
+						"user":     "postgres",
+						"password": "--------",
+					}),
+				),
+			},
+			{
+				Config:   testAccDataSourceConfigMigrateWriteOnly,
+				PlanOnly: true,
+			},
+			{
+				// Switching back to options stores options in the state again.
+				Config: testAccDataSourceConfigMigrateOptions("supersecret3"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(addr, "options", `{"dbname":"postgres","host":"postgres","password":"supersecret3","port":5432,"user":"postgres"}`),
+				),
+			},
+			{
+				Config:   testAccDataSourceConfigMigrateOptions("supersecret3"),
+				PlanOnly: true,
+			},
+		},
+	})
+}
+
+func testAccDataSourceConfigWriteOnlyRename(name string) string {
+	return fmt.Sprintf(`
+resource "redash_data_source" "my_data_source_write_only_rename" {
+  name = %q
+  type = "pg"
+  options_wo = jsonencode({
+    dbname   = "postgres"
+    host     = "postgres"
+    port     = 5432
+    user     = "postgres"
+    password = "supersecret"
+  })
+  options_wo_version = 1
+}
+`, name)
+}
+
+func testAccDataSourceConfigMigrateOptions(password string) string {
+	return fmt.Sprintf(`
+resource "redash_data_source" "my_data_source_migrate" {
+  name = "my-data-source-migrate"
+  type = "pg"
+  options = jsonencode({
+    dbname   = "postgres"
+    host     = "postgres"
+    port     = 5432
+    user     = "postgres"
+    password = %q
+  })
+}
+`, password)
+}
+
+const testAccDataSourceConfigMigrateWriteOnly = `
+resource "redash_data_source" "my_data_source_migrate" {
+  name = "my-data-source-migrate"
+  type = "pg"
+  options_wo = jsonencode({
+    dbname   = "postgres2"
+    host     = "postgres"
+    port     = 5432
+    user     = "postgres"
+    password = "supersecret2"
+  })
+  options_wo_version = 1
+}
+`
