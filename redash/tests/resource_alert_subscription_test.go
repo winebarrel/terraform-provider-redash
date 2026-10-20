@@ -1,8 +1,11 @@
 package test
 
 import (
+	"context"
 	"fmt"
 	"regexp"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -20,6 +23,68 @@ func TestAccAlertSubscription_basic(t *testing.T) {
 			{
 				Config: testAccAlertSubscriptionConfigBasic,
 				Check:  testAccCheckAlertSubscription("redash_alert_subscription.my_subs"),
+			},
+			{
+				// The import ID is <alert_id>/<alert_destination_id>, while the
+				// resource ID is <alert_id>/<subscription_id>.
+				ResourceName:      "redash_alert_subscription.my_subs",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateIdFunc: func(s *terraform.State) (string, error) {
+					rs, ok := s.RootModule().Resources["redash_alert_subscription.my_subs"]
+					if !ok {
+						return "", fmt.Errorf("Not found: redash_alert_subscription.my_subs")
+					}
+
+					return rs.Primary.Attributes["alert_id"] + "/" + rs.Primary.Attributes["alert_destination_id"], nil
+				},
+			},
+		},
+	})
+}
+
+func TestAccAlertSubscription_removedOutOfBand(t *testing.T) {
+	const addr = "redash_alert_subscription.my_subs"
+
+	var alertId, subsId int
+
+	resource.Test(t, resource.TestCase{
+		ProviderFactories: testAccProviderFactories,
+		PreCheck:          func() { testAccPreCheck(t) },
+		Steps: []resource.TestStep{
+			{
+				Config: testAccAlertSubscriptionConfigBasic,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckAlertSubscription(addr),
+					func(s *terraform.State) error {
+						alertIdStr, subsIdStr, _ := strings.Cut(s.RootModule().Resources[addr].Primary.ID, "/")
+
+						var err error
+
+						if alertId, err = strconv.Atoi(alertIdStr); err != nil {
+							return err
+						}
+
+						subsId, err = strconv.Atoi(subsIdStr)
+
+						return err
+					},
+				),
+			},
+			{
+				PreConfig: func() {
+					if err := testAccNewClient(t).RemoveAlertSubscription(context.Background(), alertId, subsId); err != nil {
+						t.Fatal(err)
+					}
+				},
+				// The subscription is gone, so the plan must show a create.
+				Config:             testAccAlertSubscriptionConfigBasic,
+				PlanOnly:           true,
+				ExpectNonEmptyPlan: true,
+			},
+			{
+				Config: testAccAlertSubscriptionConfigBasic,
+				Check:  testAccCheckAlertSubscription(addr),
 			},
 		},
 	})

@@ -14,7 +14,7 @@ import (
 func resourceAlertSubscription() *schema.Resource {
 	return &schema.Resource{
 		CreateContext: createAlertSubscription,
-		ReadContext:   schema.NoopContext,
+		ReadContext:   readAlertSubscription,
 		DeleteContext: deleteAlertSubscription,
 		Importer: &schema.ResourceImporter{
 			StateContext: importAlertSubscription,
@@ -45,6 +45,48 @@ func createAlertSubscription(ctx context.Context, d *schema.ResourceData, meta a
 	}
 
 	d.SetId(fmt.Sprintf("%d/%d", alertId, subs.ID))
+
+	return nil
+}
+
+func readAlertSubscription(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
+	alertIdStr, subsIdStr, ok := strings.Cut(d.Id(), "/")
+	if !ok {
+		return diag.Errorf("invalid ID: %q", d.Id())
+	}
+
+	alertId, err := strconv.Atoi(alertIdStr)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	subsId, err := strconv.Atoi(subsIdStr)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	client := meta.(*redashgo.Client)
+	subsList, err := client.ListAlertSubscriptions(ctx, alertId)
+	if err != nil {
+		// Redash answers GET /api/alerts/:id/subscriptions with 500 for a
+		// deleted alert, so ask GET /api/alerts/:id, which answers 404.
+		if _, getErr := client.GetAlert(ctx, alertId); getErr != nil && strings.Contains(getErr.Error(), "HTTP status code not OK: 404") {
+			d.SetId("")
+			return nil
+		}
+
+		return diag.FromErr(err)
+	}
+
+	for _, s := range subsList {
+		if s.ID == subsId && s.Destination != nil {
+			d.Set("alert_id", s.AlertID)                    //nolint:errcheck
+			d.Set("alert_destination_id", s.Destination.ID) //nolint:errcheck
+			return nil
+		}
+	}
+
+	d.SetId("")
 
 	return nil
 }
@@ -89,7 +131,8 @@ func importAlertSubscription(ctx context.Context, d *schema.ResourceData, meta a
 	}
 
 	for _, s := range subsList {
-		if s.Destination.ID == destId {
+		// A subscription to the user's own email has no destination.
+		if s.Destination != nil && s.Destination.ID == destId {
 			d.SetId(fmt.Sprintf("%d/%d", alertId, s.ID))
 			d.Set("alert_id", s.AlertID)                    //nolint:errcheck
 			d.Set("alert_destination_id", s.Destination.ID) //nolint:errcheck
