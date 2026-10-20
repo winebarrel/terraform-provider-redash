@@ -65,14 +65,10 @@ func readGroupMember(ctx context.Context, d *schema.ResourceData, meta any) diag
 	}
 
 	client := meta.(*redashgo.Client)
+	// Redash does not return 404 for a deleted group. It returns an empty list,
+	// because it only filters users by group ID without looking up the group.
 	members, err := client.ListGroupMembers(ctx, groupId)
 	if err != nil {
-		// The group was deleted.
-		if strings.Contains(err.Error(), "HTTP status code not OK: 404") {
-			d.SetId("")
-			return nil
-		}
-
 		return diag.FromErr(err)
 	}
 
