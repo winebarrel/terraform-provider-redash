@@ -1,3 +1,17 @@
+## [Unreleased]
+
+### Changed
+
+* Read `redash_group_member` from Redash, so a membership removed outside Terraform shows up as a diff and importing a non-existent membership fails. [pull#216](https://github.com/winebarrel/terraform-provider-redash/pull/216) [pull#218](https://github.com/winebarrel/terraform-provider-redash/pull/218) [pull#222](https://github.com/winebarrel/terraform-provider-redash/pull/222)
+* Read `redash_alert_subscription` from Redash, so a subscription removed outside Terraform shows up as a diff. [pull#221](https://github.com/winebarrel/terraform-provider-redash/pull/221)
+* Remove `redash_group` and `redash_alert` from the state when they are deleted outside Terraform, instead of failing on refresh. [pull#219](https://github.com/winebarrel/terraform-provider-redash/pull/219) [pull#220](https://github.com/winebarrel/terraform-provider-redash/pull/220)
+* Return an error instead of ignoring malformed IDs on `redash_group_member` and `redash_alert_subscription` delete. [pull#222](https://github.com/winebarrel/terraform-provider-redash/pull/222)
+* Add descriptions to `redash_group_member` and `redash_alert_subscription` arguments. [pull#222](https://github.com/winebarrel/terraform-provider-redash/pull/222)
+
+### Fixed
+
+* Fix a panic on `redash_alert_subscription` import when the alert has a subscription without a destination. [pull#221](https://github.com/winebarrel/terraform-provider-redash/pull/221)
+
 ## [1.12.0] - 2026-10-05
 
 ### Added
