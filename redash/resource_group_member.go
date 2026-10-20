@@ -21,14 +21,16 @@ func resourceGroupMember() *schema.Resource {
 		},
 		Schema: map[string]*schema.Schema{
 			"group_id": {
-				Type:     schema.TypeInt,
-				Required: true,
-				ForceNew: true,
+				Description: "ID of the group.",
+				Type:        schema.TypeInt,
+				Required:    true,
+				ForceNew:    true,
 			},
 			"user_id": {
-				Type:     schema.TypeInt,
-				Required: true,
-				ForceNew: true,
+				Description: "ID of the user to add to the group.",
+				Type:        schema.TypeInt,
+				Required:    true,
+				ForceNew:    true,
 			},
 		},
 	}
@@ -86,12 +88,24 @@ func readGroupMember(ctx context.Context, d *schema.ResourceData, meta any) diag
 }
 
 func deleteGroupUser(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
-	groupIdStr, memberIdStr, _ := strings.Cut(d.Id(), "/")
-	groupId, _ := strconv.Atoi(groupIdStr)
-	memberId, _ := strconv.Atoi(memberIdStr)
+	groupIdStr, memberIdStr, ok := strings.Cut(d.Id(), "/")
+	if !ok {
+		return diag.Errorf("invalid ID: %q", d.Id())
+	}
+
+	groupId, err := strconv.Atoi(groupIdStr)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	memberId, err := strconv.Atoi(memberIdStr)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
 	client := meta.(*redashgo.Client)
 
-	err := client.RemoveGroupMember(ctx, groupId, memberId)
+	err = client.RemoveGroupMember(ctx, groupId, memberId)
 	if err != nil {
 		return diag.FromErr(err)
 	}

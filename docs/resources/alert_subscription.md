@@ -44,8 +44,8 @@ resource "redash_alert_subscription" "my_subs" {
 
 ### Required
 
-- `alert_destination_id` (Number)
-- `alert_id` (Number)
+- `alert_destination_id` (Number) ID of the alert destination to notify.
+- `alert_id` (Number) ID of the alert.
 
 ### Read-Only
 

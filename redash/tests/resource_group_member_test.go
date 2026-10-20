@@ -31,6 +31,20 @@ func TestAccGroupMember_basic(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
+			{
+				// A user that is not in the group cannot be imported.
+				ResourceName: "redash_group_member.my_member",
+				ImportState:  true,
+				ImportStateIdFunc: func(s *terraform.State) (string, error) {
+					rs, ok := s.RootModule().Resources["redash_group_member.my_member"]
+					if !ok {
+						return "", fmt.Errorf("Not found: redash_group_member.my_member")
+					}
+
+					return rs.Primary.Attributes["group_id"] + "/999999", nil
+				},
+				ExpectError: regexp.MustCompile(`Cannot import non-existent remote object`),
+			},
 		},
 	})
 }
