@@ -50,13 +50,22 @@ func readGroup(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagn
 		return diag.FromErr(err)
 	}
 
+	// Redash answers GET /api/groups/:id with 500 for a deleted group, so look
+	// the group up in the list instead.
 	client := meta.(*redashgo.Client)
-	group, err := client.GetGroup(ctx, id)
+	groups, err := client.ListGroups(ctx)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	d.Set("name", group.Name) //nolint:errcheck
+	for _, g := range groups {
+		if g.ID == id {
+			d.Set("name", g.Name) //nolint:errcheck
+			return nil
+		}
+	}
+
+	d.SetId("")
 
 	return nil
 }
