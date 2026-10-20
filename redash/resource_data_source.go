@@ -57,11 +57,11 @@ func resourceDataSource() *schema.Resource {
 				RequiredWith:  []string{"options_wo"},
 				ConflictsWith: []string{"options"},
 			},
-			"remove_from_default_group": {
-				Description: "When true, the data source is removed from the organization's `default` group right after it is created. Redash grants every new data source to that group with full access, and every user is a member of it, so the data source would otherwise be visible to all users. Applied on create only: changing this on an existing data source does nothing, and it is not read back from Redash.",
+			"in_default_group": {
+				Description: "Whether the data source is in the organization's `default` group. Redash adds every new data source to that group with full access, and every user is a member of it, so the data source is visible to all users unless this is `false`. When this changes to `true`, the data source is added back with full access. Do not manage the `default` group of the same data source with `redash_group_data_source` or `redash_group_data_sources` too.",
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Default:     false,
+				Default:     true,
 			},
 		},
 	}
@@ -90,7 +90,7 @@ func createDataSource(ctx context.Context, d *schema.ResourceData, meta any) dia
 
 	d.SetId(strconv.Itoa(ds.ID))
 
-	if d.Get("remove_from_default_group").(bool) {
+	if !d.Get("in_default_group").(bool) {
 		if diags := removeFromDefaultGroupOrDelete(ctx, d, client, ds.ID); diags.HasError() {
 			return diags
 		}
@@ -120,18 +120,57 @@ func removeFromDefaultGroupOrDelete(ctx context.Context, d *schema.ResourceData,
 // removeFromDefaultGroup revokes the grant that Redash gives the builtin
 // "default" group to every new data source.
 func removeFromDefaultGroup(ctx context.Context, client *redashgo.Client, dsId int) error {
-	groups, err := client.ListGroups(ctx)
+	groupId, err := defaultGroupId(ctx, client)
 	if err != nil {
 		return err
 	}
 
+	return client.RemoveGroupDataSource(ctx, groupId, dsId)
+}
+
+func defaultGroupId(ctx context.Context, client *redashgo.Client) (int, error) {
+	groups, err := client.ListGroups(ctx)
+	if err != nil {
+		return 0, err
+	}
+
 	for _, g := range groups {
 		if g.Type == "builtin" && g.Name == "default" {
-			return client.RemoveGroupDataSource(ctx, g.ID, dsId)
+			return g.ID, nil
 		}
 	}
 
-	return fmt.Errorf("default group not found")
+	return 0, fmt.Errorf("default group not found")
+}
+
+func readInDefaultGroup(ctx context.Context, d *schema.ResourceData, client *redashgo.Client) error {
+	dsId, err := strconv.Atoi(d.Id())
+	if err != nil {
+		return err
+	}
+
+	groupId, err := defaultGroupId(ctx, client)
+	if err != nil {
+		return err
+	}
+
+	dsList, err := client.ListGroupDataSources(ctx, groupId)
+	if err != nil {
+		return err
+	}
+
+	in := false
+
+	for _, ds := range dsList {
+		if ds.ID == dsId {
+			in = true
+			break
+		}
+	}
+
+	d.Set("in_default_group", in) //nolint:errcheck
+
+	return nil
 }
 
 func readDataSource(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
@@ -141,6 +180,10 @@ func readDataSource(ctx context.Context, d *schema.ResourceData, meta any) diag.
 
 	err := readDataSource0(ctx, d, meta, storeOptions)
 	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	if err := readInDefaultGroup(ctx, d, meta.(*redashgo.Client)); err != nil {
 		return diag.FromErr(err)
 	}
 
@@ -220,6 +263,21 @@ func updateDataSource(ctx context.Context, d *schema.ResourceData, meta any) dia
 		return diag.FromErr(err)
 	}
 
+	if d.HasChange("in_default_group") {
+		if d.Get("in_default_group").(bool) {
+			groupId, err := defaultGroupId(ctx, client)
+			if err != nil {
+				return diag.FromErr(err)
+			}
+
+			if _, err := client.AddGroupDataSource(ctx, groupId, id); err != nil {
+				return diag.FromErr(err)
+			}
+		} else if err := removeFromDefaultGroup(ctx, client, id); err != nil {
+			return diag.FromErr(err)
+		}
+	}
+
 	return nil
 }
 
@@ -244,8 +302,9 @@ func importDataSource(ctx context.Context, d *schema.ResourceData, meta any) ([]
 		return nil, err
 	}
 
-	// Create-only flag that Redash does not return.
-	d.Set("remove_from_default_group", false) //nolint:errcheck
+	if err := readInDefaultGroup(ctx, d, meta.(*redashgo.Client)); err != nil {
+		return nil, err
+	}
 
 	return []*schema.ResourceData{d}, nil
 }
