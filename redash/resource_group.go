@@ -3,6 +3,7 @@ package redash
 import (
 	"context"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -53,6 +54,12 @@ func readGroup(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagn
 	client := meta.(*redashgo.Client)
 	group, err := client.GetGroup(ctx, id)
 	if err != nil {
+		// Redash answers GET /api/groups/:id with 500, not 404, for a deleted group.
+		if strings.Contains(err.Error(), "HTTP status code not OK: 500") {
+			d.SetId("")
+			return nil
+		}
+
 		return diag.FromErr(err)
 	}
 
