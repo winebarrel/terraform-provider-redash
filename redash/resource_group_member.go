@@ -14,7 +14,7 @@ import (
 func resourceGroupMember() *schema.Resource {
 	return &schema.Resource{
 		CreateContext: createGroupUser,
-		ReadContext:   schema.NoopContext,
+		ReadContext:   readGroupMember,
 		DeleteContext: deleteGroupUser,
 		Importer: &schema.ResourceImporter{
 			StateContext: importGroupMember,
@@ -44,6 +44,47 @@ func createGroupUser(ctx context.Context, d *schema.ResourceData, meta any) diag
 	}
 
 	d.SetId(fmt.Sprintf("%d/%d", groupId, member.ID))
+
+	return nil
+}
+
+func readGroupMember(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
+	groupIdStr, userIdStr, ok := strings.Cut(d.Id(), "/")
+	if !ok {
+		return diag.Errorf("invalid ID: %q", d.Id())
+	}
+
+	groupId, err := strconv.Atoi(groupIdStr)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	userId, err := strconv.Atoi(userIdStr)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	client := meta.(*redashgo.Client)
+	members, err := client.ListGroupMembers(ctx, groupId)
+	if err != nil {
+		// The group was deleted.
+		if strings.Contains(err.Error(), "HTTP status code not OK: 404") {
+			d.SetId("")
+			return nil
+		}
+
+		return diag.FromErr(err)
+	}
+
+	for _, m := range members {
+		if m.ID == userId {
+			d.Set("group_id", groupId) //nolint:errcheck
+			d.Set("user_id", userId)   //nolint:errcheck
+			return nil
+		}
+	}
+
+	d.SetId("")
 
 	return nil
 }
