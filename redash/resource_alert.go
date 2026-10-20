@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -36,7 +37,7 @@ var (
 func resourceAlert() *schema.Resource {
 	return &schema.Resource{
 		CreateContext: createAlert,
-		ReadContext:   readAlert,
+		ReadContext:   readAlertResource,
 		UpdateContext: updateAlert,
 		DeleteContext: deleteAlert,
 		Importer: &schema.ResourceImporter{
@@ -164,6 +165,22 @@ func createAlert(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 func readAlert(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
 	err := readAlert0(ctx, d, meta)
 	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	return nil
+}
+
+// readAlertResource clears the ID when the alert was deleted. The data source
+// keeps using readAlert, so a missing alert is an error there.
+func readAlertResource(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
+	err := readAlert0(ctx, d, meta)
+	if err != nil {
+		if strings.Contains(err.Error(), "HTTP status code not OK: 404") {
+			d.SetId("")
+			return nil
+		}
+
 		return diag.FromErr(err)
 	}
 
