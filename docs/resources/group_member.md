@@ -32,8 +32,8 @@ resource "redash_group_member" "my_member" {
 
 ### Required
 
-- `group_id` (Number)
-- `user_id` (Number)
+- `group_id` (Number) ID of the group.
+- `user_id` (Number) ID of the user to add to the group.
 
 ### Read-Only
 

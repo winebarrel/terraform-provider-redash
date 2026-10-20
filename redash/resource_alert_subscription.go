@@ -22,14 +22,16 @@ func resourceAlertSubscription() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"alert_id": {
-				Type:     schema.TypeInt,
-				Required: true,
-				ForceNew: true,
+				Description: "ID of the alert.",
+				Type:        schema.TypeInt,
+				Required:    true,
+				ForceNew:    true,
 			},
 			"alert_destination_id": {
-				Type:     schema.TypeInt,
-				Required: true,
-				ForceNew: true,
+				Description: "ID of the alert destination to notify.",
+				Type:        schema.TypeInt,
+				Required:    true,
+				ForceNew:    true,
 			},
 		},
 	}
@@ -92,12 +94,24 @@ func readAlertSubscription(ctx context.Context, d *schema.ResourceData, meta any
 }
 
 func deleteAlertSubscription(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
-	alertIdStr, subsIdStr, _ := strings.Cut(d.Id(), "/")
-	alertId, _ := strconv.Atoi(alertIdStr)
-	subsId, _ := strconv.Atoi(subsIdStr)
+	alertIdStr, subsIdStr, ok := strings.Cut(d.Id(), "/")
+	if !ok {
+		return diag.Errorf("invalid ID: %q", d.Id())
+	}
+
+	alertId, err := strconv.Atoi(alertIdStr)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	subsId, err := strconv.Atoi(subsIdStr)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
 	client := meta.(*redashgo.Client)
 
-	err := client.RemoveAlertSubscription(ctx, alertId, subsId)
+	err = client.RemoveAlertSubscription(ctx, alertId, subsId)
 	if err != nil {
 		return diag.FromErr(err)
 	}
