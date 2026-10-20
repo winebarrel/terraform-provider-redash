@@ -1,9 +1,12 @@
 package test
 
 import (
+	"context"
+	"strconv"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
 func TestAccAlert_basic(t *testing.T) {
@@ -112,6 +115,40 @@ func TestAccAlert_basic(t *testing.T) {
 					}),
 					resource.TestCheckResourceAttr("redash_alert.my_alert", "muted", "false"),
 				),
+			},
+		},
+	})
+}
+
+func TestAccAlert_deletedOutOfBand(t *testing.T) {
+	var id int
+
+	resource.Test(t, resource.TestCase{
+		ProviderFactories: testAccProviderFactories,
+		PreCheck:          func() { testAccPreCheck(t) },
+		Steps: []resource.TestStep{
+			{
+				Config: testAccAlertConfigBasic,
+				Check: func(s *terraform.State) error {
+					var err error
+					id, err = strconv.Atoi(s.RootModule().Resources["redash_alert.my_alert"].Primary.ID)
+					return err
+				},
+			},
+			{
+				PreConfig: func() {
+					if err := testAccNewClient(t).DeleteAlert(context.Background(), id); err != nil {
+						t.Fatal(err)
+					}
+				},
+				// The alert is gone, so the plan must show a create, not an error.
+				Config:             testAccAlertConfigBasic,
+				PlanOnly:           true,
+				ExpectNonEmptyPlan: true,
+			},
+			{
+				Config: testAccAlertConfigBasic,
+				Check:  resource.TestCheckResourceAttr("redash_alert.my_alert", "name", "my-alert"),
 			},
 		},
 	})
