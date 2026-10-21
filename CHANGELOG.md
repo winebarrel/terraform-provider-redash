@@ -16,6 +16,10 @@
 
 * Fix a panic on `redash_alert_subscription` import when the alert has a subscription without a destination. [pull#221](https://github.com/winebarrel/terraform-provider-redash/pull/221)
 
+### Security
+
+* Build with Go 1.27.3 to fix CVE-2026-111943 ([GO-2026-6809](https://pkg.go.dev/vuln/GO-2026-6809)) in `crypto/x509`. [pull#217](https://github.com/winebarrel/terraform-provider-redash/pull/217)
+
 ## [1.12.0] - 2026-10-05
 
 ### Added
