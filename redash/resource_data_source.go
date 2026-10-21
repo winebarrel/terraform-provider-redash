@@ -3,6 +3,7 @@ package redash
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"strconv"
 
 	"github.com/hashicorp/go-cty/cty"
@@ -56,6 +57,12 @@ func resourceDataSource() *schema.Resource {
 				RequiredWith:  []string{"options_wo"},
 				ConflictsWith: []string{"options"},
 			},
+			"remove_from_default_group": {
+				Description: "When true, the data source is removed from the organization's `default` group right after it is created. Redash grants every new data source to that group with full access, and every user is a member of it, so the data source would otherwise be visible to all users. Applied on create only: changing this on an existing data source does nothing, and it is not read back from Redash.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+			},
 		},
 	}
 }
@@ -83,7 +90,48 @@ func createDataSource(ctx context.Context, d *schema.ResourceData, meta any) dia
 
 	d.SetId(strconv.Itoa(ds.ID))
 
+	if d.Get("remove_from_default_group").(bool) {
+		if diags := removeFromDefaultGroupOrDelete(ctx, d, client, ds.ID); diags.HasError() {
+			return diags
+		}
+	}
+
 	return readDataSource(ctx, d, meta)
+}
+
+// removeFromDefaultGroupOrDelete fails closed: without the removal the data
+// source stays visible to every user, so do not leave it behind. If the cleanup
+// fails too, keep the id so Terraform tracks and taints the object.
+func removeFromDefaultGroupOrDelete(ctx context.Context, d *schema.ResourceData, client *redashgo.Client, dsId int) diag.Diagnostics {
+	err := removeFromDefaultGroup(ctx, client, dsId)
+	if err == nil {
+		return nil
+	}
+
+	if delErr := client.DeleteDataSource(ctx, dsId); delErr != nil {
+		return diag.Errorf("remove data source %d from default group: %s; deleting it also failed: %s", dsId, err, delErr)
+	}
+
+	d.SetId("")
+
+	return diag.Errorf("remove data source from default group (data source was deleted): %s", err)
+}
+
+// removeFromDefaultGroup revokes the grant that Redash gives the builtin
+// "default" group to every new data source.
+func removeFromDefaultGroup(ctx context.Context, client *redashgo.Client, dsId int) error {
+	groups, err := client.ListGroups(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, g := range groups {
+		if g.Type == "builtin" && g.Name == "default" {
+			return client.RemoveGroupDataSource(ctx, g.ID, dsId)
+		}
+	}
+
+	return fmt.Errorf("default group not found")
 }
 
 func readDataSource(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
@@ -195,6 +243,9 @@ func importDataSource(ctx context.Context, d *schema.ResourceData, meta any) ([]
 	if err != nil {
 		return nil, err
 	}
+
+	// Create-only flag that Redash does not return.
+	d.Set("remove_from_default_group", false) //nolint:errcheck
 
 	return []*schema.ResourceData{d}, nil
 }

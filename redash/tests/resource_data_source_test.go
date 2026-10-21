@@ -33,8 +33,123 @@ func TestAccDataSource_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("redash_data_source.my_data_source", "options", `{"dbname":"postgres2","host":"postgres2","port":5433,"user":"postgres2"}`),
 				),
 			},
+			{
+				ResourceName:      "redash_data_source.my_data_source",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
+}
+
+func TestAccDataSource_removeFromDefaultGroup(t *testing.T) {
+	const addr = "redash_data_source.my_data_source_private"
+
+	resource.Test(t, resource.TestCase{
+		ProviderFactories: testAccProviderFactories,
+		PreCheck:          func() { testAccPreCheck(t) },
+		Steps: []resource.TestStep{
+			{
+				// Redash grants a new data source to the default group.
+				Config: testAccDataSourceConfigPrivate("false"),
+				Check:  testAccCheckDataSourceInDefaultGroup(addr, true),
+			},
+			{
+				// Toggling on an existing data source does nothing.
+				Config: testAccDataSourceConfigPrivate("true"),
+				Check:  testAccCheckDataSourceInDefaultGroup(addr, true),
+			},
+			{
+				Config:  testAccDataSourceConfigPrivate("true"),
+				Destroy: true,
+			},
+			{
+				Config: testAccDataSourceConfigPrivate("true"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(addr, "remove_from_default_group", "true"),
+					testAccCheckDataSourceInDefaultGroup(addr, false),
+				),
+			},
+			{
+				Config:   testAccDataSourceConfigPrivate("true"),
+				PlanOnly: true,
+			},
+			{
+				// The flag is create-only and not returned by Redash.
+				ResourceName:            addr,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"remove_from_default_group"},
+			},
+		},
+	})
+}
+
+func testAccCheckDataSourceInDefaultGroup(addr string, want bool) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		rs, ok := s.RootModule().Resources[addr]
+		if !ok {
+			return fmt.Errorf("not found: %s", addr)
+		}
+
+		id, err := strconv.Atoi(rs.Primary.ID)
+		if err != nil {
+			return err
+		}
+
+		client, err := redashgo.NewClient(testAccRedashURL, testAccRedashAPIKey)
+		if err != nil {
+			return err
+		}
+
+		groups, err := client.ListGroups(context.Background())
+		if err != nil {
+			return err
+		}
+
+		for _, g := range groups {
+			if g.Type != "builtin" || g.Name != "default" {
+				continue
+			}
+
+			dsList, err := client.ListGroupDataSources(context.Background(), g.ID)
+			if err != nil {
+				return err
+			}
+
+			got := false
+
+			for _, ds := range dsList {
+				if ds.ID == id {
+					got = true
+				}
+			}
+
+			if got != want {
+				return fmt.Errorf("data source %d in default group = %t, want %t", id, got, want)
+			}
+
+			return nil
+		}
+
+		return fmt.Errorf("default group not found")
+	}
+}
+
+func testAccDataSourceConfigPrivate(remove string) string {
+	return fmt.Sprintf(`
+resource "redash_data_source" "my_data_source_private" {
+  name = "my-data-source-private"
+  type = "pg"
+  options = jsonencode({
+    dbname = "postgres"
+    host   = "postgres"
+    port   = 5432
+    user   = "postgres"
+  })
+  remove_from_default_group = %s
+}
+`, remove)
 }
 
 func TestAccDataSource_secret(t *testing.T) {
@@ -132,6 +247,14 @@ func TestAccDataSource_optionsWriteOnly(t *testing.T) {
 			{
 				Config:   testAccDataSourceConfigWriteOnlyPg,
 				PlanOnly: true,
+			},
+			{
+				// Redash does not return options_wo, and import records the API
+				// options, so skip the option attributes.
+				ResourceName:            addr,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"options", "options_wo", "options_wo_version"},
 			},
 			{
 				// A new options_wo value with the same version must not plan an update.
