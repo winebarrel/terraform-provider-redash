@@ -2,7 +2,7 @@
 
 ### Changed
 
-* **BREAKING** Replace `in_default_group` on `redash_data_source` with `remove_from_default_group_on_create`, which only works on create. [pull#228](https://github.com/winebarrel/terraform-provider-redash/pull/228)
+* **BREAKING** Replace `in_default_group` on `redash_data_source` with `remove_from_default_group_on_create`, which only works on create. [pull#229](https://github.com/winebarrel/terraform-provider-redash/pull/229)
 
 ## [1.13.0] - 2026-10-21
 
