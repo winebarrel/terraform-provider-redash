@@ -9,5 +9,5 @@ resource "redash_data_source" "private_database" {
   })
   # Redash adds every new data source to the default group, which includes all users.
   # Keep it out of that group, then grant access to specific groups.
-  in_default_group = false
+  remove_from_default_group_on_create = true
 }

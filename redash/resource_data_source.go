@@ -57,11 +57,10 @@ func resourceDataSource() *schema.Resource {
 				RequiredWith:  []string{"options_wo"},
 				ConflictsWith: []string{"options"},
 			},
-			"in_default_group": {
-				Description: "Whether the data source is in the organization's `default` group. Redash adds every new data source to that group with full access, and every user is a member of it, so the data source is visible to all users unless this is `false`. When this changes to `true`, the data source is added back with full access. Do not manage the `default` group of the same data source with `redash_group_data_source` or `redash_group_data_sources` too.",
+			"remove_from_default_group_on_create": {
+				Description: "Remove the data source from the `default` group on create. Redash adds every new data source to this group, so all users can see it. Has no effect after create. To change the `default` group later, use `redash_group_data_source` or `redash_group_data_sources`.",
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Default:     true,
 			},
 		},
 	}
@@ -90,7 +89,7 @@ func createDataSource(ctx context.Context, d *schema.ResourceData, meta any) dia
 
 	d.SetId(strconv.Itoa(ds.ID))
 
-	if !d.Get("in_default_group").(bool) {
+	if d.Get("remove_from_default_group_on_create").(bool) {
 		if diags := removeFromDefaultGroupOrDelete(ctx, d, client, ds.ID); diags.HasError() {
 			return diags
 		}
@@ -143,36 +142,6 @@ func defaultGroupId(ctx context.Context, client *redashgo.Client) (int, error) {
 	return 0, fmt.Errorf("default group not found")
 }
 
-func readInDefaultGroup(ctx context.Context, d *schema.ResourceData, client *redashgo.Client) error {
-	dsId, err := strconv.Atoi(d.Id())
-	if err != nil {
-		return err
-	}
-
-	groupId, err := defaultGroupId(ctx, client)
-	if err != nil {
-		return err
-	}
-
-	dsList, err := client.ListGroupDataSources(ctx, groupId)
-	if err != nil {
-		return err
-	}
-
-	in := false
-
-	for _, ds := range dsList {
-		if ds.ID == dsId {
-			in = true
-			break
-		}
-	}
-
-	d.Set("in_default_group", in) //nolint:errcheck
-
-	return nil
-}
-
 func readDataSource(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
 	// Refresh does not include write-only values. When options is unset, leave
 	// it unset so options_wo is not copied from the API into state.
@@ -180,10 +149,6 @@ func readDataSource(ctx context.Context, d *schema.ResourceData, meta any) diag.
 
 	err := readDataSource0(ctx, d, meta, storeOptions)
 	if err != nil {
-		return diag.FromErr(err)
-	}
-
-	if err := readInDefaultGroup(ctx, d, meta.(*redashgo.Client)); err != nil {
 		return diag.FromErr(err)
 	}
 
@@ -238,6 +203,11 @@ func readDataSource0(ctx context.Context, d *schema.ResourceData, meta any, stor
 }
 
 func updateDataSource(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
+	// remove_from_default_group_on_create only takes effect on create.
+	if !d.HasChangesExcept("remove_from_default_group_on_create") {
+		return nil
+	}
+
 	id, _ := strconv.Atoi(d.Id())
 	client := meta.(*redashgo.Client)
 
@@ -263,21 +233,6 @@ func updateDataSource(ctx context.Context, d *schema.ResourceData, meta any) dia
 		return diag.FromErr(err)
 	}
 
-	if d.HasChange("in_default_group") {
-		if d.Get("in_default_group").(bool) {
-			groupId, err := defaultGroupId(ctx, client)
-			if err != nil {
-				return diag.FromErr(err)
-			}
-
-			if _, err := client.AddGroupDataSource(ctx, groupId, id); err != nil {
-				return diag.FromErr(err)
-			}
-		} else if err := removeFromDefaultGroup(ctx, client, id); err != nil {
-			return diag.FromErr(err)
-		}
-	}
-
 	return nil
 }
 
@@ -299,10 +254,6 @@ func importDataSource(ctx context.Context, d *schema.ResourceData, meta any) ([]
 	// Import records the API options, including masked secrets.
 	err := readDataSource0(ctx, d, meta, true)
 	if err != nil {
-		return nil, err
-	}
-
-	if err := readInDefaultGroup(ctx, d, meta.(*redashgo.Client)); err != nil {
 		return nil, err
 	}
 
