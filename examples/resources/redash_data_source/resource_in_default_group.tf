@@ -7,7 +7,7 @@ resource "redash_data_source" "private_database" {
     port   = 5432
     user   = "private-database"
   })
-  # Redash grants every new data source to the default group, which includes all users.
-  # Remove that grant on create, then grant access to specific groups.
-  remove_from_default_group = true
+  # Redash adds every new data source to the default group, which includes all users.
+  # Keep it out of that group, then grant access to specific groups.
+  in_default_group = false
 }

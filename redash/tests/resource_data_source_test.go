@@ -42,7 +42,7 @@ func TestAccDataSource_basic(t *testing.T) {
 	})
 }
 
-func TestAccDataSource_removeFromDefaultGroup(t *testing.T) {
+func TestAccDataSource_inDefaultGroup(t *testing.T) {
 	const addr = "redash_data_source.my_data_source_private"
 
 	resource.Test(t, resource.TestCase{
@@ -50,36 +50,53 @@ func TestAccDataSource_removeFromDefaultGroup(t *testing.T) {
 		PreCheck:          func() { testAccPreCheck(t) },
 		Steps: []resource.TestStep{
 			{
-				// Redash grants a new data source to the default group.
-				Config: testAccDataSourceConfigPrivate("false"),
-				Check:  testAccCheckDataSourceInDefaultGroup(addr, true),
+				// Redash adds a new data source to the default group.
+				Config: testAccDataSourceConfigPrivate("true"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(addr, "in_default_group", "true"),
+					testAccCheckDataSourceInDefaultGroup(addr, true),
+				),
 			},
 			{
-				// Toggling on an existing data source does nothing.
+				// Changing it to false removes the existing data source.
+				Config: testAccDataSourceConfigPrivate("false"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(addr, "in_default_group", "false"),
+					testAccCheckDataSourceInDefaultGroup(addr, false),
+				),
+			},
+			{
+				Config:   testAccDataSourceConfigPrivate("false"),
+				PlanOnly: true,
+			},
+			{
+				ResourceName:      addr,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			{
+				// Changing it back to true adds the data source again.
 				Config: testAccDataSourceConfigPrivate("true"),
-				Check:  testAccCheckDataSourceInDefaultGroup(addr, true),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(addr, "in_default_group", "true"),
+					testAccCheckDataSourceInDefaultGroup(addr, true),
+				),
 			},
 			{
 				Config:  testAccDataSourceConfigPrivate("true"),
 				Destroy: true,
 			},
 			{
-				Config: testAccDataSourceConfigPrivate("true"),
+				// Creating with false removes the new data source.
+				Config: testAccDataSourceConfigPrivate("false"),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(addr, "remove_from_default_group", "true"),
+					resource.TestCheckResourceAttr(addr, "in_default_group", "false"),
 					testAccCheckDataSourceInDefaultGroup(addr, false),
 				),
 			},
 			{
-				Config:   testAccDataSourceConfigPrivate("true"),
+				Config:   testAccDataSourceConfigPrivate("false"),
 				PlanOnly: true,
-			},
-			{
-				// The flag is create-only and not returned by Redash.
-				ResourceName:            addr,
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"remove_from_default_group"},
 			},
 		},
 	})
@@ -136,7 +153,7 @@ func testAccCheckDataSourceInDefaultGroup(addr string, want bool) resource.TestC
 	}
 }
 
-func testAccDataSourceConfigPrivate(remove string) string {
+func testAccDataSourceConfigPrivate(inDefaultGroup string) string {
 	return fmt.Sprintf(`
 resource "redash_data_source" "my_data_source_private" {
   name = "my-data-source-private"
@@ -147,9 +164,9 @@ resource "redash_data_source" "my_data_source_private" {
     port   = 5432
     user   = "postgres"
   })
-  remove_from_default_group = %s
+  in_default_group = %s
 }
-`, remove)
+`, inDefaultGroup)
 }
 
 func TestAccDataSource_secret(t *testing.T) {
