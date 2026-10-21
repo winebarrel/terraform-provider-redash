@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Added
+
+* Add `in_default_group` argument to `redash_data_source` to keep the data source out of the `default` group, which Redash adds every new data source to. [pull#215](https://github.com/winebarrel/terraform-provider-redash/pull/215) [pull#223](https://github.com/winebarrel/terraform-provider-redash/pull/223)
+
 ### Changed
 
 * Read `redash_group_member` from Redash, so a membership removed outside Terraform shows up as a diff and importing a non-existent membership fails. [pull#216](https://github.com/winebarrel/terraform-provider-redash/pull/216) [pull#218](https://github.com/winebarrel/terraform-provider-redash/pull/218) [pull#222](https://github.com/winebarrel/terraform-provider-redash/pull/222)
