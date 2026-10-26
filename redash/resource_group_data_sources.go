@@ -223,7 +223,12 @@ func configuredGroupDataSources(d *schema.ResourceData) (map[int]bool, error) {
 // here; d.Get would read it as 0, so two of them would look like duplicates.
 // configuredGroupDataSources checks again at apply time, when every id is known.
 func rejectDuplicateGroupDataSources(_ context.Context, d *schema.ResourceDiff, _ any) error {
-	set := d.GetRawPlan().GetAttr("data_source")
+	plan := d.GetRawPlan()
+	if !plan.IsKnown() || plan.IsNull() {
+		return nil
+	}
+
+	set := plan.GetAttr("data_source")
 	if !set.IsKnown() || set.IsNull() {
 		return nil
 	}

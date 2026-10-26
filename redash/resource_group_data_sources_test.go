@@ -108,3 +108,28 @@ func TestResourceGroupDataSources_planRejectsDuplicates(t *testing.T) {
 		})
 	}
 }
+
+func TestResourceGroupDataSources_planWithoutRawPlan(t *testing.T) {
+	proposed := cty.ObjectVal(map[string]cty.Value{
+		"id":       cty.UnknownVal(cty.String),
+		"group_id": cty.NumberIntVal(21),
+		"data_source": cty.SetVal([]cty.Value{cty.ObjectVal(map[string]cty.Value{
+			"data_source_id": cty.NumberIntVal(4),
+			"name":           cty.UnknownVal(cty.String),
+			"view_only":      cty.False,
+		})}),
+	})
+
+	r := resourceGroupDataSources()
+	ty := r.CoreConfigSchema().ImpliedType()
+	prior, err := r.ShimInstanceStateFromValue(cty.NullVal(ty))
+	require.NoError(t, err)
+	prior.RawState = cty.NullVal(ty)
+	prior.RawPlan = cty.NullVal(ty)
+	prior.RawConfig = cty.NullVal(ty)
+
+	require.NotPanics(t, func() {
+		_, err = r.SimpleDiff(context.Background(), prior, terraform.NewResourceConfigShimmed(proposed, r.CoreConfigSchema()), nil)
+	})
+	require.NoError(t, err)
+}
