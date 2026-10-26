@@ -2,7 +2,9 @@
 
 ### Fixed
 
-* Remove `redash_data_source`, `redash_group_data_sources`, `redash_group_data_source`, `redash_user` and `redash_alert_destination` from the state when they are deleted outside Terraform, instead of failing on refresh. For the two grant resources this means their group was deleted.
+* Remove `redash_data_source`, `redash_group_data_sources`, `redash_group_data_source`, `redash_user` and `redash_alert_destination` from the state when they are deleted outside Terraform, instead of failing on refresh. For the two grant resources this means their group was deleted. [pull#234](https://github.com/winebarrel/terraform-provider-redash/pull/234)
+
+* Fix `redash_query` keeping a schedule in the state after it is removed outside Terraform, so the plan showed no diff. [pull#235](https://github.com/winebarrel/terraform-provider-redash/pull/235)
 
 ## [1.15.0] - 2026-10-26
 
