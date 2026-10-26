@@ -132,7 +132,7 @@ func deleteGroupDataSources(ctx context.Context, d *schema.ResourceData, meta an
 		}
 		seen[ds.ID] = struct{}{}
 
-		if err := client.RemoveGroupDataSource(ctx, groupId, ds.ID); err != nil {
+		if err := removeGroupDataSource(ctx, client, groupId, ds.ID); err != nil {
 			return diag.FromErr(err)
 		}
 	}
@@ -194,7 +194,7 @@ func syncGroupDataSources(ctx context.Context, d *schema.ResourceData, meta any,
 			continue
 		}
 
-		if err := client.RemoveGroupDataSource(ctx, groupId, id); err != nil {
+		if err := removeGroupDataSource(ctx, client, groupId, id); err != nil {
 			return diag.FromErr(err)
 		}
 	}
@@ -202,7 +202,7 @@ func syncGroupDataSources(ctx context.Context, d *schema.ResourceData, meta any,
 	return nil
 }
 
-func configuredGroupDataSources(d interface{ Get(string) any }) (map[int]bool, error) {
+func configuredGroupDataSources(d *schema.ResourceData) (map[int]bool, error) {
 	set := d.Get("data_source").(*schema.Set)
 	grants := make(map[int]bool, set.Len())
 
@@ -218,7 +218,31 @@ func configuredGroupDataSources(d interface{ Get(string) any }) (map[int]bool, e
 	return grants, nil
 }
 
+// rejectDuplicateGroupDataSources checks the ids known at plan time. An id
+// still unknown (its data source is created in the same apply) is skipped
+// here; d.Get would read it as 0, so two of them would look like duplicates.
+// configuredGroupDataSources checks again at apply time, when every id is known.
 func rejectDuplicateGroupDataSources(_ context.Context, d *schema.ResourceDiff, _ any) error {
-	_, err := configuredGroupDataSources(d)
-	return err
+	set := d.GetRawPlan().GetAttr("data_source")
+	if !set.IsKnown() || set.IsNull() {
+		return nil
+	}
+
+	seen := map[int64]struct{}{}
+
+	for it := set.ElementIterator(); it.Next(); {
+		_, item := it.Element()
+		idVal := item.GetAttr("data_source_id")
+		if !idVal.IsKnown() {
+			continue
+		}
+
+		id, _ := idVal.AsBigFloat().Int64()
+		if _, ok := seen[id]; ok {
+			return fmt.Errorf("duplicate data_source_id %d", id)
+		}
+		seen[id] = struct{}{}
+	}
+
+	return nil
 }

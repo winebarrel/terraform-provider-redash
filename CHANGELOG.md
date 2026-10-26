@@ -1,3 +1,10 @@
+## [Unreleased]
+
+### Fixed
+
+* Fix `redash_group_data_sources` failing to plan with `duplicate data_source_id 0` when its `data_source` blocks reference two or more data sources created in the same apply with different `view_only` values.
+* Fix `redash_group_data_sources` and `redash_group_data_source` failing to remove a grant when the data source is deleted in the same apply. A grant that is already gone now counts as removed.
+
 ## [1.14.0] - 2026-10-22
 
 ### Changed
