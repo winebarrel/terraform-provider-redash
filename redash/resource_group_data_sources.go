@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -82,6 +83,12 @@ func readGroupDataSourcesSet(ctx context.Context, d *schema.ResourceData, meta a
 	client := meta.(*redashgo.Client)
 	dsList, err := client.ListGroupDataSources(ctx, groupId)
 	if err != nil {
+		// The group was deleted outside Terraform.
+		if strings.Contains(err.Error(), "HTTP status code not OK: 404") {
+			d.SetId("")
+			return nil
+		}
+
 		return diag.FromErr(err)
 	}
 

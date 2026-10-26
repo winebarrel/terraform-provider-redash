@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -149,6 +150,13 @@ func readDataSource(ctx context.Context, d *schema.ResourceData, meta any) diag.
 
 	err := readDataSource0(ctx, d, meta, storeOptions)
 	if err != nil {
+		// Deleted outside Terraform. Import keeps the error: it reads through
+		// readDataSource0 directly.
+		if strings.Contains(err.Error(), "HTTP status code not OK: 404") {
+			d.SetId("")
+			return nil
+		}
+
 		return diag.FromErr(err)
 	}
 

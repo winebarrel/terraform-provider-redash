@@ -72,6 +72,12 @@ func readGroupDataSource(ctx context.Context, d *schema.ResourceData, meta any) 
 
 	dsList, err := client.ListGroupDataSources(ctx, groupId)
 	if err != nil {
+		// The group was deleted outside Terraform.
+		if strings.Contains(err.Error(), "HTTP status code not OK: 404") {
+			d.SetId("")
+			return nil
+		}
+
 		return diag.FromErr(err)
 	}
 

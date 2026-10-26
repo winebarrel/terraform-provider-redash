@@ -3,6 +3,7 @@ package redash
 import (
 	"context"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -52,6 +53,12 @@ func createUser(ctx context.Context, d *schema.ResourceData, meta any) diag.Diag
 func readUser(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
 	err := readUser0(ctx, d, meta)
 	if err != nil {
+		// Deleted outside Terraform.
+		if strings.Contains(err.Error(), "HTTP status code not OK: 404") {
+			d.SetId("")
+			return nil
+		}
+
 		return diag.FromErr(err)
 	}
 

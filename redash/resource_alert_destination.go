@@ -70,6 +70,13 @@ func createAlertDestination(ctx context.Context, d *schema.ResourceData, meta an
 func readAlertDestination(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
 	err := readAlertDestination0(ctx, d, meta)
 	if err != nil {
+		// Redash answers GET /api/destinations/:id with 500, not 404, for a
+		// deleted destination, so check the list before dropping it.
+		if gone, listErr := alertDestinationGone(ctx, d, meta); listErr == nil && gone {
+			d.SetId("")
+			return nil
+		}
+
 		return diag.FromErr(err)
 	}
 
@@ -122,4 +129,25 @@ func importAlertDestination(ctx context.Context, d *schema.ResourceData, meta an
 	}
 
 	return []*schema.ResourceData{d}, nil
+}
+
+func alertDestinationGone(ctx context.Context, d *schema.ResourceData, meta any) (bool, error) {
+	id, err := strconv.Atoi(d.Id())
+	if err != nil {
+		return false, err
+	}
+
+	client := meta.(*redashgo.Client)
+	dests, err := client.ListDestinations(ctx)
+	if err != nil {
+		return false, err
+	}
+
+	for _, dest := range dests {
+		if dest.ID == id {
+			return false, nil
+		}
+	}
+
+	return true, nil
 }

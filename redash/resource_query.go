@@ -337,6 +337,12 @@ func createQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 func readQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
 	err := readQuery0(ctx, d, meta)
 	if err != nil {
+		// Deleted outside Terraform.
+		if strings.Contains(err.Error(), "HTTP status code not OK: 404") {
+			d.SetId("")
+			return nil
+		}
+
 		return diag.FromErr(err)
 	}
 
@@ -353,6 +359,13 @@ func readQuery0(ctx context.Context, d *schema.ResourceData, meta any) error {
 	query, err := client.GetQuery(ctx, id)
 	if err != nil {
 		return err
+	}
+
+	// Deleting a query archives it, here and in the Redash UI, so an archived
+	// query is gone.
+	if query.IsArchived {
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("data_source_id", query.DataSourceID) //nolint:errcheck
