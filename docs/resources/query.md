@@ -3,12 +3,12 @@
 page_title: "redash_query Resource - redash"
 subcategory: ""
 description: |-
-  
+  ~> Note: Destroying this resource archives the query, because Redash has no API that deletes a query. Archiving also removes the query's schedule, its widgets on dashboards and its alerts.
 ---
 
 # redash_query (Resource)
 
-
+~> **Note:** Destroying this resource archives the query, because Redash has no API that deletes a query. Archiving also removes the query's schedule, its widgets on dashboards and its alerts.
 
 ## Example Usage
 

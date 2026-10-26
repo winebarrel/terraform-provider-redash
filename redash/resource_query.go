@@ -14,6 +14,7 @@ import (
 
 func resourceQuery() *schema.Resource {
 	return &schema.Resource{
+		Description:   "~> **Note:** Destroying this resource archives the query, because Redash has no API that deletes a query. Archiving also removes the query's schedule, its widgets on dashboards and its alerts.",
 		CreateContext: createQuery,
 		ReadContext:   readQuery,
 		UpdateContext: updateQuery,
