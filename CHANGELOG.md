@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Added
+
+* Add `archived_query_as_deleted` provider argument to treat an archived query as deleted, so `redash_query` drops it from the state and the next plan creates it again. Redash has no API that deletes a query. [pull#236](https://github.com/winebarrel/terraform-provider-redash/pull/236)
+
 ### Fixed
 
 * Remove `redash_data_source`, `redash_group_data_sources`, `redash_group_data_source`, `redash_user` and `redash_alert_destination` from the state when they are deleted outside Terraform, instead of failing on refresh. For the two grant resources this means their group was deleted.
