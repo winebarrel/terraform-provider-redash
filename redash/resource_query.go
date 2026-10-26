@@ -370,6 +370,8 @@ func readQuery0(ctx context.Context, d *schema.ResourceData, meta any) error {
 	if query.Schedule != nil && query.Schedule.Interval != 0 {
 		schedule := map[string]any{"interval": query.Schedule.Interval}
 		d.Set("schedule", []any{schedule}) //nolint:errcheck
+	} else {
+		d.Set("schedule", nil) //nolint:errcheck
 	}
 
 	if len(query.Tags) > 0 {

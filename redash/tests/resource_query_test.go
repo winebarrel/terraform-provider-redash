@@ -1,12 +1,15 @@
 package test
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strconv"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	redashgo "github.com/winebarrel/redash-go/v2"
 )
 
 func TestAccQuery_basic(t *testing.T) {
@@ -130,6 +133,56 @@ func TestAccQuery_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("redash_query.my_query", "tags.0", "bar"),
 					resource.TestCheckResourceAttr("redash_query.my_query", "published", "false"),
 				),
+			},
+		},
+	})
+}
+
+func TestAccQuery_scheduleRemovedOutOfBand(t *testing.T) {
+	var id string
+
+	resource.Test(t, resource.TestCase{
+		ProviderFactories: testAccProviderFactories,
+		PreCheck:          func() { testAccPreCheck(t) },
+		Steps: []resource.TestStep{
+			{
+				Config: testAccQueryConfigBasic2,
+				Check: func(s *terraform.State) error {
+					id = s.RootModule().Resources["redash_query.my_query"].Primary.ID
+					return nil
+				},
+			},
+			{
+				PreConfig: func() {
+					ctx := context.Background()
+					client := testAccNewClient(t)
+					query, err := client.GetQuery(ctx, atoi(t, id))
+					if err != nil {
+						t.Fatal(err)
+					}
+
+					// Schedule stays nil, so the update removes it.
+					_, err = client.UpdateQuery(ctx, query.ID, &redashgo.UpdateQueryInput{
+						DataSourceID:            query.DataSourceID,
+						Name:                    query.Name,
+						Description:             query.Description,
+						Query:                   query.Query,
+						IsDraft:                 &query.IsDraft,
+						WithoutOmittingSchedule: true,
+					})
+					if err != nil {
+						t.Fatal(err)
+					}
+				},
+				Config:             testAccQueryConfigBasic2,
+				PlanOnly:           true,
+				ExpectNonEmptyPlan: true,
+			},
+			{
+				Config: testAccQueryConfigBasic2,
+				Check: resource.TestCheckTypeSetElemNestedAttrs("redash_query.my_query", "schedule.*", map[string]string{
+					"interval": "600",
+				}),
 			},
 		},
 	})
