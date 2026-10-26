@@ -12,7 +12,7 @@ func TestAccAlertDestinations_basic(t *testing.T) {
 		PreCheck:          func() { testAccPreCheck(t) },
 		Steps: []resource.TestStep{
 			{
-				Config: testAccAlertSestinationConfigBasic,
+				Config: testAccAlertDestinationConfigBasic,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("redash_alert_destination.my_dest", "name", "my-dest"),
 					resource.TestCheckResourceAttr("redash_alert_destination.my_dest", "type", "email"),
@@ -20,7 +20,7 @@ func TestAccAlertDestinations_basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccAlertSestinationConfigBasic2,
+				Config: testAccAlertDestinationConfigBasic2,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("redash_alert_destination.my_dest", "name", "my-dest2"),
 					resource.TestCheckResourceAttr("redash_alert_destination.my_dest", "type", "email"),
@@ -31,7 +31,7 @@ func TestAccAlertDestinations_basic(t *testing.T) {
 	})
 }
 
-const testAccAlertSestinationConfigBasic = `
+const testAccAlertDestinationConfigBasic = `
 resource "redash_alert_destination" "my_dest" {
   name = "my-dest"
   type = "email"
@@ -41,7 +41,7 @@ resource "redash_alert_destination" "my_dest" {
 }
 `
 
-const testAccAlertSestinationConfigBasic2 = `
+const testAccAlertDestinationConfigBasic2 = `
 resource "redash_alert_destination" "my_dest" {
   name = "my-dest2"
   type = "email"

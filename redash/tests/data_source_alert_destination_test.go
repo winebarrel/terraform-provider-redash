@@ -6,16 +6,16 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccDataSourceAlertDestnation_basic(t *testing.T) {
+func TestAccDataSourceAlertDestination_basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		ProviderFactories: testAccProviderFactories,
 		PreCheck:          func() { testAccPreCheck(t) },
 		Steps: []resource.TestStep{
 			{
-				Config: testAccAlertSestinationConfigBasic,
+				Config: testAccAlertDestinationConfigBasic,
 			},
 			{
-				Config: TestAccDataSourceAlertDestnationConfigBasic,
+				Config: testAccDataSourceAlertDestinationConfigBasic,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.redash_alert_destination.my_dest", "name", "my-dest"),
 					resource.TestCheckResourceAttr("data.redash_alert_destination.my_dest", "type", "email"),
@@ -26,7 +26,7 @@ func TestAccDataSourceAlertDestnation_basic(t *testing.T) {
 	})
 }
 
-const TestAccDataSourceAlertDestnationConfigBasic = testAccAlertSestinationConfigBasic + `
+const testAccDataSourceAlertDestinationConfigBasic = testAccAlertDestinationConfigBasic + `
 data "redash_alert_destination" "my_dest" {
   name = "my-dest"
 }

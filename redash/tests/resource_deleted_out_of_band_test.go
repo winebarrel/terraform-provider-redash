@@ -87,7 +87,7 @@ func TestAccUser_deletedOutOfBand(t *testing.T) {
 }
 
 func TestAccAlertDestination_deletedOutOfBand(t *testing.T) {
-	testAccDeletedOutOfBand(t, testAccAlertSestinationConfigBasic, "redash_alert_destination.my_dest",
+	testAccDeletedOutOfBand(t, testAccAlertDestinationConfigBasic, "redash_alert_destination.my_dest",
 		func(c *redashgo.Client, id string) error {
 			return c.DeleteDestination(context.Background(), atoi(t, id))
 		})
