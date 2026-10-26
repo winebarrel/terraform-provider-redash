@@ -33,6 +33,12 @@ func Provider() *schema.Provider {
 				Sensitive:   true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
+			"archived_query_as_deleted": {
+				Description: "Treat an archived query as deleted, so `redash_query` drops it from the state and the next plan creates it again. Redash has no API that deletes a query: deleting one, in the UI or by destroying `redash_query`, archives it. Defaults to `false`.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+			},
 		},
 		ConfigureContextFunc: providerConfigure,
 		ResourcesMap: map[string]*schema.Resource{
@@ -60,6 +66,12 @@ func Provider() *schema.Provider {
 	}
 }
 
+// providerMeta is the meta value passed to every resource and data source.
+type providerMeta struct {
+	client                 *redash_go.Client
+	archivedQueryAsDeleted bool
+}
+
 func providerConfigure(ctx context.Context, d *schema.ResourceData) (any, diag.Diagnostics) {
 	url := d.Get("url").(string)
 
@@ -85,7 +97,12 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (any, diag.D
 
 	client.SetDebug(logging.IsDebugOrHigher())
 
-	return client, nil
+	meta := &providerMeta{
+		client:                 client,
+		archivedQueryAsDeleted: d.Get("archived_query_as_deleted").(bool),
+	}
+
+	return meta, nil
 }
 
 // httpHeaders reads the optional http_headers provider argument.

@@ -125,7 +125,7 @@ func resourceAlert() *schema.Resource {
 }
 
 func createAlert(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 
 	optionsList := d.Get("options").([]any)
 	options := optionsList[0].(map[string]any)
@@ -193,7 +193,7 @@ func readAlert0(ctx context.Context, d *schema.ResourceData, meta any) error {
 		return err
 	}
 
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 	alert, err := client.GetAlert(ctx, id)
 	if err != nil {
 		return err
@@ -221,7 +221,7 @@ func readAlert0(ctx context.Context, d *schema.ResourceData, meta any) error {
 
 func updateAlert(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
 	id, _ := strconv.Atoi(d.Id())
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 
 	input := &redashgo.UpdateAlertInput{
 		Name:    d.Get("name").(string),
@@ -264,7 +264,7 @@ func updateAlert(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 
 func deleteAlert(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
 	id, _ := strconv.Atoi(d.Id())
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 
 	err := client.DeleteAlert(ctx, id)
 	if err != nil {

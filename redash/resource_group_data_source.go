@@ -42,7 +42,7 @@ func resourceGroupDataSource() *schema.Resource {
 }
 
 func createGroupDataSource(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 	groupId := d.Get("group_id").(int)
 	dsId := d.Get("data_source_id").(int)
 	gds, err := client.AddGroupDataSource(ctx, groupId, dsId)
@@ -68,7 +68,7 @@ func readGroupDataSource(ctx context.Context, d *schema.ResourceData, meta any) 
 	groupIdStr, gdsIdStr, _ := strings.Cut(d.Id(), "/")
 	groupId, _ := strconv.Atoi(groupIdStr)
 	gdsId, _ := strconv.Atoi(gdsIdStr)
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 
 	dsList, err := client.ListGroupDataSources(ctx, groupId)
 	if err != nil {
@@ -99,7 +99,7 @@ func updateGroupDataSource(ctx context.Context, d *schema.ResourceData, meta any
 	groupIdStr, gdsIdStr, _ := strings.Cut(d.Id(), "/")
 	groupId, _ := strconv.Atoi(groupIdStr)
 	gdsId, _ := strconv.Atoi(gdsIdStr)
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 
 	if d.HasChange("view_only") {
 		_, err := client.UpdateGroupDataSource(ctx, groupId, gdsId, &redashgo.UpdateGroupDataSourceInput{
@@ -117,7 +117,7 @@ func deleteGroupDataSource(ctx context.Context, d *schema.ResourceData, meta any
 	groupIdStr, gdsIdStr, _ := strings.Cut(d.Id(), "/")
 	groupId, _ := strconv.Atoi(groupIdStr)
 	gdsId, _ := strconv.Atoi(gdsIdStr)
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 
 	if err := removeGroupDataSource(ctx, client, groupId, gdsId); err != nil {
 		return diag.FromErr(err)

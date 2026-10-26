@@ -33,7 +33,7 @@ func resourceUser() *schema.Resource {
 }
 
 func createUser(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 
 	input := &redashgo.CreateUsersInput{
 		Name:  d.Get("name").(string),
@@ -71,7 +71,7 @@ func readUser0(ctx context.Context, d *schema.ResourceData, meta any) error {
 		return err
 	}
 
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 	user, err := client.GetUser(ctx, id)
 	if err != nil {
 		return err
@@ -85,7 +85,7 @@ func readUser0(ctx context.Context, d *schema.ResourceData, meta any) error {
 
 func updateUser(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
 	id, _ := strconv.Atoi(d.Id())
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 
 	input := &redashgo.UpdateUserInput{
 		Name:  d.Get("name").(string),
@@ -102,7 +102,7 @@ func updateUser(ctx context.Context, d *schema.ResourceData, meta any) diag.Diag
 
 func deleteUser(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
 	id, _ := strconv.Atoi(d.Id())
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 
 	err := client.DeleteUser(ctx, id)
 	if err != nil {

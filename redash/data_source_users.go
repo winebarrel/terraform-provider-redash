@@ -44,7 +44,7 @@ func globToRegexp(s string) string {
 }
 
 func readUsersByFilter(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 	rName := regexp.MustCompile("")
 	rEmail := regexp.MustCompile("")
 

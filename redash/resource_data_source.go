@@ -68,7 +68,7 @@ func resourceDataSource() *schema.Resource {
 }
 
 func createDataSource(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 
 	input := &redashgo.CreateDataSourceInput{
 		Name: d.Get("name").(string),
@@ -169,7 +169,7 @@ func readDataSource0(ctx context.Context, d *schema.ResourceData, meta any, stor
 		return err
 	}
 
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 	ds, err := client.GetDataSource(ctx, id)
 	if err != nil {
 		return err
@@ -217,7 +217,7 @@ func updateDataSource(ctx context.Context, d *schema.ResourceData, meta any) dia
 	}
 
 	id, _ := strconv.Atoi(d.Id())
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 
 	input := &redashgo.UpdateDataSourceInput{
 		Name: d.Get("name").(string),
@@ -246,7 +246,7 @@ func updateDataSource(ctx context.Context, d *schema.ResourceData, meta any) dia
 
 func deleteDataSource(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
 	id, _ := strconv.Atoi(d.Id())
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 
 	err := client.DeleteDataSource(ctx, id)
 	if err != nil {

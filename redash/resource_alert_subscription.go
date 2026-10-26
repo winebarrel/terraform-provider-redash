@@ -8,7 +8,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	redashgo "github.com/winebarrel/redash-go/v2"
 )
 
 func resourceAlertSubscription() *schema.Resource {
@@ -38,7 +37,7 @@ func resourceAlertSubscription() *schema.Resource {
 }
 
 func createAlertSubscription(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 	alertId := d.Get("alert_id").(int)
 	destId := d.Get("alert_destination_id").(int)
 	subs, err := client.AddAlertSubscription(ctx, alertId, destId)
@@ -67,7 +66,7 @@ func readAlertSubscription(ctx context.Context, d *schema.ResourceData, meta any
 		return diag.FromErr(err)
 	}
 
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 	subsList, err := client.ListAlertSubscriptions(ctx, alertId)
 	if err != nil {
 		// Redash answers GET /api/alerts/:id/subscriptions with 500 for a
@@ -109,7 +108,7 @@ func deleteAlertSubscription(ctx context.Context, d *schema.ResourceData, meta a
 		return diag.FromErr(err)
 	}
 
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 
 	err = client.RemoveAlertSubscription(ctx, alertId, subsId)
 	if err != nil {
@@ -137,7 +136,7 @@ func importAlertSubscription(ctx context.Context, d *schema.ResourceData, meta a
 		return nil, err
 	}
 
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 
 	subsList, err := client.ListAlertSubscriptions(ctx, alertId)
 	if err != nil {

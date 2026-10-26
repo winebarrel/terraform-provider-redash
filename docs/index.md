@@ -24,5 +24,6 @@ provider "redash" {
 ### Optional
 
 - `api_key` (String, Sensitive) Redash User API Key. This can also be set from the REDASH_API_KEY environment variable.
+- `archived_query_as_deleted` (Boolean) Treat an archived query as deleted, so `redash_query` drops it from the state and the next plan creates it again. Redash has no API that deletes a query: deleting one, in the UI or by destroying `redash_query`, archives it. Defaults to `false`.
 - `http_headers` (Map of String, Sensitive) Extra HTTP headers sent on every Redash API request.
 - `url` (String) Redash API endpoint URL. This can also be set from the REDASH_URL environment variable.
