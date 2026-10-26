@@ -132,7 +132,7 @@ func deleteGroupDataSources(ctx context.Context, d *schema.ResourceData, meta an
 		}
 		seen[ds.ID] = struct{}{}
 
-		if err := client.RemoveGroupDataSource(ctx, groupId, ds.ID); err != nil {
+		if err := removeGroupDataSource(ctx, client, groupId, ds.ID); err != nil {
 			return diag.FromErr(err)
 		}
 	}
@@ -194,7 +194,7 @@ func syncGroupDataSources(ctx context.Context, d *schema.ResourceData, meta any,
 			continue
 		}
 
-		if err := client.RemoveGroupDataSource(ctx, groupId, id); err != nil {
+		if err := removeGroupDataSource(ctx, client, groupId, id); err != nil {
 			return diag.FromErr(err)
 		}
 	}

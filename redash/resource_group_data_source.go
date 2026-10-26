@@ -113,12 +113,35 @@ func deleteGroupDataSource(ctx context.Context, d *schema.ResourceData, meta any
 	gdsId, _ := strconv.Atoi(gdsIdStr)
 	client := meta.(*redashgo.Client)
 
-	err := client.RemoveGroupDataSource(ctx, groupId, gdsId)
-	if err != nil {
+	if err := removeGroupDataSource(ctx, client, groupId, gdsId); err != nil {
 		return diag.FromErr(err)
 	}
 
 	d.SetId("")
+
+	return nil
+}
+
+// removeGroupDataSource revokes a grant, and treats one that is already gone
+// as revoked. Redash drops the grants of a deleted data source, so when the
+// data source is destroyed in the same apply, the removal can fail after the
+// grant has disappeared.
+func removeGroupDataSource(ctx context.Context, client *redashgo.Client, groupId int, dsId int) error {
+	err := client.RemoveGroupDataSource(ctx, groupId, dsId)
+	if err == nil {
+		return nil
+	}
+
+	dsList, listErr := client.ListGroupDataSources(ctx, groupId)
+	if listErr != nil {
+		return err
+	}
+
+	for _, ds := range dsList {
+		if ds.ID == dsId {
+			return err
+		}
+	}
 
 	return nil
 }
