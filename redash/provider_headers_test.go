@@ -9,7 +9,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/stretchr/testify/require"
-	redash_go "github.com/winebarrel/redash-go/v2"
 )
 
 func TestProviderConfigure_httpHeaders(t *testing.T) {
@@ -81,7 +80,7 @@ func TestProviderConfigure_httpHeaders(t *testing.T) {
 			meta, diags := providerConfigure(context.Background(), d)
 			require.False(t, diags.HasError())
 
-			client := meta.(*redash_go.Client)
+			client := meta.(*providerMeta).client
 			res, closeBody, err := client.Get(context.Background(), "ping", nil)
 			require.NoError(t, err)
 			defer closeBody()

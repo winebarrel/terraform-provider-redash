@@ -29,7 +29,7 @@ func resourceGroup() *schema.Resource {
 }
 
 func createGroup(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 
 	input := &redashgo.CreateGroupInput{
 		Name: d.Get("name").(string),
@@ -51,7 +51,7 @@ func readGroup(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagn
 		return diag.FromErr(err)
 	}
 
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 	group, err := client.GetGroup(ctx, id)
 	if err != nil {
 		// Redash answers GET /api/groups/:id with 500, not 404, for a deleted group.
@@ -70,7 +70,7 @@ func readGroup(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagn
 
 func updateGroup(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
 	id, _ := strconv.Atoi(d.Id())
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 
 	input := &redashgo.UpdateGroupInput{
 		Name: d.Get("name").(string),
@@ -86,7 +86,7 @@ func updateGroup(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 
 func deleteGroup(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
 	id, _ := strconv.Atoi(d.Id())
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 
 	err := client.DeleteGroup(ctx, id)
 	if err != nil {

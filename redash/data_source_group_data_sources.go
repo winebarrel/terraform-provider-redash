@@ -45,7 +45,7 @@ func dataSourceGroupDataSources() *schema.Resource {
 }
 
 func readGroupDataSources(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 	groupId := d.Get("group_id").(int)
 
 	dsList, err := client.ListGroupDataSources(ctx, groupId)

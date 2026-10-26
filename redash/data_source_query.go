@@ -134,7 +134,7 @@ func dataSourceQuery() *schema.Resource {
 }
 
 func readQueryByName(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 	var queryId *int
 
 	if rawId, ok := d.GetOk("query_id"); ok {
@@ -151,6 +151,10 @@ func readQueryByName(ctx context.Context, d *schema.ResourceData, meta any) diag
 
 		if name != "" && query.Name != name {
 			return diag.Errorf("Query (%s) not found", name)
+		}
+
+		if query.IsArchived && meta.(*providerMeta).archivedQueryAsDeleted {
+			return diag.Errorf("Query (%d) is archived", query.ID)
 		}
 
 		d.SetId(strconv.Itoa(query.ID))

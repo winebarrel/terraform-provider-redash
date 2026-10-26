@@ -80,7 +80,7 @@ func readGroupDataSourcesSet(ctx context.Context, d *schema.ResourceData, meta a
 		return diag.FromErr(err)
 	}
 
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 	dsList, err := client.ListGroupDataSources(ctx, groupId)
 	if err != nil {
 		// The group was deleted outside Terraform.
@@ -126,7 +126,7 @@ func deleteGroupDataSources(ctx context.Context, d *schema.ResourceData, meta an
 		return diag.FromErr(err)
 	}
 
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 	dsList, err := client.ListGroupDataSources(ctx, groupId)
 	if err != nil {
 		return diag.FromErr(err)
@@ -166,7 +166,7 @@ func syncGroupDataSources(ctx context.Context, d *schema.ResourceData, meta any,
 		return diag.FromErr(err)
 	}
 
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 	dsList, err := client.ListGroupDataSources(ctx, groupId)
 	if err != nil {
 		return diag.FromErr(err)

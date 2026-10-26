@@ -273,7 +273,7 @@ func getQueryOptions(d *schema.ResourceData) []redashgo.QueryOptionsParameter {
 }
 
 func createQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 
 	input := &redashgo.CreateQueryInput{
 		DataSourceID: d.Get("data_source_id").(int),
@@ -349,10 +349,15 @@ func readQuery0(ctx context.Context, d *schema.ResourceData, meta any) error {
 		return err
 	}
 
-	client := meta.(*redashgo.Client)
-	query, err := client.GetQuery(ctx, id)
+	pm := meta.(*providerMeta)
+	query, err := pm.client.GetQuery(ctx, id)
 	if err != nil {
 		return err
+	}
+
+	if query.IsArchived && pm.archivedQueryAsDeleted {
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("data_source_id", query.DataSourceID) //nolint:errcheck
@@ -423,7 +428,7 @@ func readQuery0(ctx context.Context, d *schema.ResourceData, meta any) error {
 
 func updateQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
 	id, _ := strconv.Atoi(d.Id())
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 	isDraft := !d.Get("published").(bool)
 
 	input := &redashgo.UpdateQueryInput{
@@ -474,7 +479,7 @@ func updateQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Dia
 
 func deleteQuery(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
 	id, _ := strconv.Atoi(d.Id())
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 
 	err := client.ArchiveQuery(ctx, id)
 	if err != nil {

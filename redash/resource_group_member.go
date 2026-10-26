@@ -8,7 +8,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	redashgo "github.com/winebarrel/redash-go/v2"
 )
 
 func resourceGroupMember() *schema.Resource {
@@ -37,7 +36,7 @@ func resourceGroupMember() *schema.Resource {
 }
 
 func createGroupUser(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 	groupId := d.Get("group_id").(int)
 	userId := d.Get("user_id").(int)
 	member, err := client.AddGroupMember(ctx, groupId, userId)
@@ -66,7 +65,7 @@ func readGroupMember(ctx context.Context, d *schema.ResourceData, meta any) diag
 		return diag.FromErr(err)
 	}
 
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 	// Redash does not return 404 for a deleted group. It returns an empty list,
 	// because it only filters users by group ID without looking up the group.
 	members, err := client.ListGroupMembers(ctx, groupId)
@@ -103,7 +102,7 @@ func deleteGroupUser(ctx context.Context, d *schema.ResourceData, meta any) diag
 		return diag.FromErr(err)
 	}
 
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 
 	err = client.RemoveGroupMember(ctx, groupId, memberId)
 	if err != nil {

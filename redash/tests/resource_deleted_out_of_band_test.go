@@ -92,3 +92,43 @@ func TestAccAlertDestination_deletedOutOfBand(t *testing.T) {
 			return c.DeleteDestination(context.Background(), atoi(t, id))
 		})
 }
+
+func TestAccQuery_archivedOutOfBand(t *testing.T) {
+	testAccDeletedOutOfBand(t, testAccQueryConfigArchivedAsDeleted, "redash_query.my_query",
+		func(c *redashgo.Client, id string) error {
+			return c.ArchiveQuery(context.Background(), atoi(t, id))
+		})
+}
+
+func TestAccQuery_archivedOutOfBandKeptByDefault(t *testing.T) {
+	var id string
+
+	resource.Test(t, resource.TestCase{
+		ProviderFactories: testAccProviderFactories,
+		PreCheck:          func() { testAccPreCheck(t) },
+		Steps: []resource.TestStep{
+			{
+				Config: testAccQueryConfigBasic,
+				Check: func(s *terraform.State) error {
+					id = s.RootModule().Resources["redash_query.my_query"].Primary.ID
+					return nil
+				},
+			},
+			{
+				PreConfig: func() {
+					if err := testAccNewClient(t).ArchiveQuery(context.Background(), atoi(t, id)); err != nil {
+						t.Fatal(err)
+					}
+				},
+				Config:   testAccQueryConfigBasic,
+				PlanOnly: true,
+			},
+		},
+	})
+}
+
+const testAccQueryConfigArchivedAsDeleted = `
+provider "redash" {
+  archived_query_as_deleted = true
+}
+` + testAccQueryConfigBasic

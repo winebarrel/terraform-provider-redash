@@ -6,7 +6,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	redashgo "github.com/winebarrel/redash-go/v2"
 )
 
 func dataSourceGroup() *schema.Resource {
@@ -22,7 +21,7 @@ func dataSourceGroup() *schema.Resource {
 }
 
 func readGroupByName(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 	name := d.Get("name").(string)
 	groups, err := client.ListGroups(ctx)
 	if err != nil {

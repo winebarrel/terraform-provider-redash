@@ -40,7 +40,7 @@ func resourceAlertDestination() *schema.Resource {
 }
 
 func createAlertDestination(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 
 	input := &redashgo.CreateDestinationInput{
 		Name: d.Get("name").(string),
@@ -89,7 +89,7 @@ func readAlertDestination0(ctx context.Context, d *schema.ResourceData, meta any
 		return err
 	}
 
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 	dest, err := client.GetDestination(ctx, id)
 	if err != nil {
 		return err
@@ -110,7 +110,7 @@ func readAlertDestination0(ctx context.Context, d *schema.ResourceData, meta any
 
 func deleteAlertDestination(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
 	id, _ := strconv.Atoi(d.Id())
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 
 	err := client.DeleteDestination(ctx, id)
 	if err != nil {
@@ -137,7 +137,7 @@ func alertDestinationGone(ctx context.Context, d *schema.ResourceData, meta any)
 		return false, err
 	}
 
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 	dests, err := client.ListDestinations(ctx)
 	if err != nil {
 		return false, err

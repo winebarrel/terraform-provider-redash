@@ -178,7 +178,11 @@ func testAccCheckGroupHasNoDataSources(s *terraform.State) error {
 		return err
 	}
 
-	client := testAccProvider.Meta().(*redashgo.Client)
+	client, err := redashgo.NewClient(testAccRedashURL, testAccRedashAPIKey)
+	if err != nil {
+		return err
+	}
+
 	dsList, err := client.ListGroupDataSources(context.Background(), groupId)
 	if err != nil {
 		return err
@@ -202,7 +206,11 @@ func testAccAddExtraGroupDataSource(s *terraform.State) error {
 		return err
 	}
 
-	client := testAccProvider.Meta().(*redashgo.Client)
+	client, err := redashgo.NewClient(testAccRedashURL, testAccRedashAPIKey)
+	if err != nil {
+		return err
+	}
+
 	_, err = client.AddGroupDataSource(context.Background(), groupId, dsId)
 	return err
 }

@@ -31,7 +31,7 @@ func dataSourceUser() *schema.Resource {
 }
 
 func readUserByName(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 	var name, email string
 	msgId := []string{}
 

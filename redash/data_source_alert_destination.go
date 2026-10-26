@@ -6,7 +6,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	redashgo "github.com/winebarrel/redash-go/v2"
 )
 
 func dataSourceAlertDestination() *schema.Resource {
@@ -30,7 +29,7 @@ func dataSourceAlertDestination() *schema.Resource {
 }
 
 func readAlertDestinationByName(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 	name := d.Get("name").(string)
 	dests, err := client.ListDestinations(ctx)
 	if err != nil {

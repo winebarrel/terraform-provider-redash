@@ -145,7 +145,7 @@ func TestRemoveGroupDataSource_dataSourceDeletedInSameApply(t *testing.T) {
 			}
 			d := newData(t, ep.id)
 
-			diags := ep.run(context.Background(), d, client)
+			diags := ep.run(context.Background(), d, &providerMeta{client: client})
 
 			require.False(t, diags.HasError(), diags)
 			require.Equal(t, ep.wantGrants, f.grants)
@@ -157,7 +157,7 @@ func TestRemoveGroupDataSource_dataSourceDeletedInSameApply(t *testing.T) {
 			f.removeFails = true
 			d := newData(t, ep.id)
 
-			diags := ep.run(context.Background(), d, client)
+			diags := ep.run(context.Background(), d, &providerMeta{client: client})
 
 			require.True(t, diags.HasError())
 			require.Equal(t, map[int]bool{4: false, 5: true}, f.grants)

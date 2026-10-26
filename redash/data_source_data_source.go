@@ -6,7 +6,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	redashgo "github.com/winebarrel/redash-go/v2"
 )
 
 func dataSourceDataSource() *schema.Resource {
@@ -30,7 +29,7 @@ func dataSourceDataSource() *schema.Resource {
 }
 
 func readDataSourceByName(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
-	client := meta.(*redashgo.Client)
+	client := meta.(*providerMeta).client
 	name := d.Get("name").(string)
 	dsList, err := client.ListDataSources(ctx)
 	if err != nil {
