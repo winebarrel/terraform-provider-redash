@@ -79,13 +79,6 @@ func TestAccGroupDataSource_groupDeletedOutOfBand(t *testing.T) {
 		})
 }
 
-func TestAccQuery_archivedOutOfBand(t *testing.T) {
-	testAccDeletedOutOfBand(t, testAccQueryConfigBasic, "redash_query.my_query",
-		func(c *redashgo.Client, id string) error {
-			return c.ArchiveQuery(context.Background(), atoi(t, id))
-		})
-}
-
 func TestAccUser_deletedOutOfBand(t *testing.T) {
 	testAccDeletedOutOfBand(t, testAccUserConfigBasic, "redash_user.my_user",
 		func(c *redashgo.Client, id string) error {
