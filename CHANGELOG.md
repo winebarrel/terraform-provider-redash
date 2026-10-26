@@ -1,3 +1,9 @@
+## [Unreleased]
+
+### Fixed
+
+* Remove `redash_data_source`, `redash_group_data_sources`, `redash_group_data_source`, `redash_user` and `redash_alert_destination` from the state when they are deleted outside Terraform, instead of failing on refresh. For the two grant resources this means their group was deleted.
+
 ## [1.15.0] - 2026-10-26
 
 ### Fixed
