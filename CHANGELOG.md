@@ -1,3 +1,9 @@
+## [Unreleased]
+
+### Fixed
+
+* Fail provider configuration when Redash rejects the API key. Redash answers 404 to a wrong key, the same status as a deleted object, so a plan with a wrong key dropped objects from the state and planned to create them again. This affected `redash_alert` and `redash_alert_subscription` since 1.13.0, and `redash_data_source`, `redash_group_data_sources`, `redash_group_data_source` and `redash_user` since 1.16.0.
+
 ## [1.16.0] - 2026-10-27
 
 ### Added
