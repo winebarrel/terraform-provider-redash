@@ -97,6 +97,12 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (any, diag.D
 
 	client.SetDebug(logging.IsDebugOrHigher())
 
+	// Redash answers 404, not 401, to a wrong API key. Reads treat 404 as a
+	// deleted object and drop it from the state, so fail before any read.
+	if err := client.TestCredentials(ctx); err != nil {
+		return nil, diag.Errorf("Redash rejected the API key, or url is not a Redash server: %s", err)
+	}
+
 	meta := &providerMeta{
 		client:                 client,
 		archivedQueryAsDeleted: d.Get("archived_query_as_deleted").(bool),
