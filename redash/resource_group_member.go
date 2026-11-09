@@ -5,10 +5,24 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
+
+// Redash stores membership as users.groups, an array rewritten in full by
+// POST/DELETE /api/groups/<id>/members. Parallel calls for one user lose
+// updates. Serialize membership changes per user inside this process.
+var groupMemberUserLocks sync.Map
+
+func lockGroupMemberUser(userID int) func() {
+	mu, _ := groupMemberUserLocks.LoadOrStore(userID, &sync.Mutex{})
+	m := mu.(*sync.Mutex)
+	m.Lock()
+
+	return m.Unlock
+}
 
 func resourceGroupMember() *schema.Resource {
 	return &schema.Resource{
@@ -39,6 +53,10 @@ func createGroupUser(ctx context.Context, d *schema.ResourceData, meta any) diag
 	client := meta.(*providerMeta).client
 	groupId := d.Get("group_id").(int)
 	userId := d.Get("user_id").(int)
+
+	unlock := lockGroupMemberUser(userId)
+	defer unlock()
+
 	member, err := client.AddGroupMember(ctx, groupId, userId)
 	if err != nil {
 		return diag.FromErr(err)
@@ -104,9 +122,24 @@ func deleteGroupUser(ctx context.Context, d *schema.ResourceData, meta any) diag
 
 	client := meta.(*providerMeta).client
 
+	unlock := lockGroupMemberUser(memberId)
+	defer unlock()
+
 	err = client.RemoveGroupMember(ctx, groupId, memberId)
 	if err != nil {
-		return diag.FromErr(err)
+		// Redash does user.group_ids.remove(group_id). A missing id raises
+		// ValueError and the API returns 500. If the user is not in the
+		// group, the membership is already gone.
+		members, listErr := client.ListGroupMembers(ctx, groupId)
+		if listErr != nil {
+			return diag.FromErr(err)
+		}
+
+		for _, member := range members {
+			if member.ID == memberId {
+				return diag.FromErr(err)
+			}
+		}
 	}
 
 	d.SetId("")
