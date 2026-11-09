@@ -61,19 +61,31 @@ func TestGroupMemberParallelCreateKeepsEveryGroup(t *testing.T) {
 	require.NoError(t, err)
 
 	res := resourceGroupMember()
+	errCh := make(chan error, 3)
 	var wg sync.WaitGroup
 	for _, groupID := range []int{10, 11, 12} {
 		wg.Add(1)
 		go func(groupID int) {
 			defer wg.Done()
 			d := res.Data(nil)
-			require.NoError(t, d.Set("group_id", groupID))
-			require.NoError(t, d.Set("user_id", userID))
-			diags := createGroupUser(context.Background(), d, &providerMeta{client: client})
-			require.False(t, diags.HasError(), fmt.Sprint(diags))
+			if err := d.Set("group_id", groupID); err != nil {
+				errCh <- err
+				return
+			}
+			if err := d.Set("user_id", userID); err != nil {
+				errCh <- err
+				return
+			}
+			if diags := createGroupUser(context.Background(), d, &providerMeta{client: client}); diags.HasError() {
+				errCh <- fmt.Errorf("group %d: %v", groupID, diags)
+			}
 		}(groupID)
 	}
 	wg.Wait()
+	close(errCh)
+	for err := range errCh {
+		require.NoError(t, err)
+	}
 
 	require.Equal(t, int32(1), maxSeen.Load(), "adds for one user must not run together")
 	require.ElementsMatch(t, []int{10, 11, 12}, groups)
