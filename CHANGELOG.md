@@ -1,3 +1,10 @@
+## [1.18.0] - 2026-11-09
+
+### Fixed
+
+* Fix `redash_group_member` losing memberships when one apply changes several groups for the same user. Redash rewrites the user's whole group list on each call, so parallel calls overwrote each other. Changes for one user now run one at a time. [pull#243](https://github.com/winebarrel/terraform-provider-redash/pull/243)
+* Fix `redash_group_member` failing to remove a membership that is already gone. Redash answers 500 in this case. [pull#243](https://github.com/winebarrel/terraform-provider-redash/pull/243)
+
 ## [1.17.0] - 2026-10-27
 
 ### Fixed
