@@ -3,12 +3,12 @@
 page_title: "redash_group_member Resource - redash"
 subcategory: ""
 description: |-
-  
+  Adds one user to one group. When that user is already a member, create records the membership and does not add another copy. Destroy removes every stored copy of the group ID, because Redash deletes only one copy per request.
 ---
 
 # redash_group_member (Resource)
 
-
+Adds one user to one group. When that user is already a member, create records the membership and does not add another copy. Destroy removes every stored copy of the group ID, because Redash deletes only one copy per request.
 
 ## Example Usage
 
