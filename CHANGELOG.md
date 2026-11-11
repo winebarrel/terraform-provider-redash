@@ -1,3 +1,9 @@
+## [1.19.0] - 2026-11-12
+
+### Fixed
+
+* Fix `redash_group_member` adding the same group to a user twice when the membership already exists. Destroy then removed only one copy, so the user stayed in the group. Create now skips users who are already members, and destroy removes every copy. [pull#245](https://github.com/winebarrel/terraform-provider-redash/pull/245)
+
 ## [1.18.0] - 2026-11-09
 
 ### Fixed
