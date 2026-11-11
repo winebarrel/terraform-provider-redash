@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -27,6 +28,25 @@ func TestGroupMemberParallelCreateKeepsEveryGroup(t *testing.T) {
 	)
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		if r.Method == http.MethodGet {
+			groupID, err := strconv.Atoi(strings.TrimPrefix(strings.TrimSuffix(r.URL.Path, "/members"), "/api/groups/"))
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			mu.Lock()
+			present := slices.Contains(groups, groupID)
+			mu.Unlock()
+			if !present {
+				_, _ = w.Write([]byte("[]"))
+				return
+			}
+			_, _ = w.Write([]byte("[" + string(memberUserJSON(userID)) + "]"))
+			return
+		}
+
 		groupID, err := strconv.Atoi(strings.TrimPrefix(strings.TrimSuffix(r.URL.Path, "/members"), "/api/groups/"))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -98,7 +118,7 @@ func TestDeleteGroupUserAbsentMembershipSucceeds(t *testing.T) {
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte("[]"))
+		_, _ = w.Write(memberUserJSON(7))
 	}))
 	t.Cleanup(srv.Close)
 
